@@ -1,0 +1,390 @@
+{% extends "base.html" %}
+{% block title %}Create Email Template - BulkMailer{% endblock title %}
+
+{% block css %}
+<style>
+  /* Email Preview Styles */
+  .email-preview {
+    color: #e5e7eb;
+    line-height: 1.6;
+  }
+  
+  .email-preview h1 {
+    font-size: 2em;
+    font-weight: bold;
+    margin-top: 0.67em;
+    margin-bottom: 0.67em;
+    color: #fff;
+  }
+  
+  .email-preview h2 {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-top: 0.83em;
+    margin-bottom: 0.83em;
+    color: #fff;
+  }
+  
+  .email-preview h3 {
+    font-size: 1.17em;
+    font-weight: bold;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    color: #fff;
+  }
+  
+  .email-preview h4 {
+    font-size: 1em;
+    font-weight: bold;
+    margin-top: 1.33em;
+    margin-bottom: 1.33em;
+    color: #fff;
+  }
+  
+  .email-preview h5 {
+    font-size: 0.83em;
+    font-weight: bold;
+    margin-top: 1.67em;
+    margin-bottom: 1.67em;
+    color: #fff;
+  }
+  
+  .email-preview h6 {
+    font-size: 0.67em;
+    font-weight: bold;
+    margin-top: 2.33em;
+    margin-bottom: 2.33em;
+    color: #fff;
+  }
+  
+  .email-preview p {
+    margin-top: 1em;
+    margin-bottom: 1em;
+  }
+  
+  .email-preview strong, .email-preview b {
+    font-weight: bold;
+  }
+  
+  .email-preview em, .email-preview i {
+    font-style: italic;
+  }
+  
+  .email-preview u {
+    text-decoration: underline;
+  }
+  
+  .email-preview a {
+    color: #06b6d4;
+    text-decoration: underline;
+  }
+  
+  .email-preview a:hover {
+    color: #0891b2;
+  }
+  
+  .email-preview ul, .email-preview ol {
+    margin-top: 1em;
+    margin-bottom: 1em;
+    padding-left: 2em;
+  }
+  
+  .email-preview ul {
+    list-style-type: disc;
+  }
+  
+  .email-preview ol {
+    list-style-type: decimal;
+  }
+  
+  .email-preview li {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+  }
+  
+  .email-preview blockquote {
+    border-left: 4px solid #06b6d4;
+    padding-left: 1em;
+    margin: 1em 0;
+    color: #9ca3af;
+  }
+  
+  .email-preview code {
+    background-color: #1e293b;
+    padding: 0.2em 0.4em;
+    border-radius: 0.25rem;
+    font-family: monospace;
+    font-size: 0.875em;
+  }
+  
+  .email-preview pre {
+    background-color: #1e293b;
+    padding: 1em;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin: 1em 0;
+  }
+  
+  .email-preview pre code {
+    background-color: transparent;
+    padding: 0;
+  }
+  
+  .email-preview hr {
+    border: none;
+    border-top: 1px solid #475569;
+    margin: 2em 0;
+  }
+  
+  .email-preview img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin: 1em 0;
+  }
+  
+  .email-preview table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+  }
+  
+  .email-preview table th,
+  .email-preview table td {
+    border: 1px solid #475569;
+    padding: 0.5em;
+    text-align: left;
+  }
+  
+  .email-preview table th {
+    background-color: #1e293b;
+    font-weight: bold;
+  }
+</style>
+{% endblock css %}
+
+{% block content %}
+<div class="min-h-screen">
+  <!-- Page Header -->
+  <div class="bg-slate-900/50 backdrop-blur-sm border-b border-slate-800">
+    <div class="container mx-auto px-6 py-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-white mb-2">Create Email Template</h1>
+          <p class="text-gray-400">Save reusable email templates for faster campaign creation</p>
+        </div>
+        <a href="{% url 'dashboard' %}" class="text-gray-400 hover:text-cyan-400 transition inline-flex items-center space-x-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          <span>Back to Dashboard</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Content -->
+  <div class="container mx-auto px-6 py-12">
+    <form method="post" action="{% url 'create_template' %}" class="max-w-7xl mx-auto">
+      {% csrf_token %}
+      
+      <!-- Info Box -->
+      <div class="mb-8 bg-cyan-500/10 border border-cyan-500/30 rounded-xl p-6">
+        <div class="flex items-start space-x-3">
+          <svg class="w-6 h-6 text-cyan-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <div>
+            <h3 class="text-lg font-semibold text-white mb-2">What are Email Templates?</h3>
+            <p class="text-gray-300 leading-relaxed">
+              Email templates let you save pre-designed email content that you can reuse across multiple campaigns. 
+              Create templates for newsletters, promotions, announcements, or any recurring email type. 
+              When creating a campaign, simply select a template to auto-fill the content!
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Template Information Section -->
+      <div class="bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-8 mb-6">
+        <h2 class="text-2xl font-bold text-white mb-6 flex items-center space-x-2">
+          <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+          </svg>
+          <span>Template Details</span>
+        </h2>
+
+        <!-- Template Name -->
+        <div class="mb-6">
+          <label for="{{ form.name.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
+            {{ form.name.label }} <span class="text-red-400">*</span>
+          </label>
+          {{ form.name }}
+          {% if form.name.errors %}
+            <p class="mt-2 text-sm text-red-400">{{ form.name.errors.0 }}</p>
+          {% endif %}
+          <p class="mt-1 text-xs text-gray-500">Give your template a descriptive name (e.g., "Monthly Newsletter", "Product Launch")</p>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-6">
+          <label for="{{ form.description.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
+            {{ form.description.label }}
+          </label>
+          {{ form.description }}
+          {% if form.description.errors %}
+            <p class="mt-2 text-sm text-red-400">{{ form.description.errors.0 }}</p>
+          {% endif %}
+          <p class="mt-1 text-xs text-gray-500">Optional: Add notes about when to use this template</p>
+        </div>
+
+        <!-- Subject Line -->
+        <div class="mb-6">
+          <label for="{{ form.subject.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
+            {{ form.subject.label }}
+          </label>
+          {{ form.subject }}
+          {% if form.subject.errors %}
+            <p class="mt-2 text-sm text-red-400">{{ form.subject.errors.0 }}</p>
+          {% endif %}
+          <p class="mt-1 text-xs text-gray-500">Optional: Pre-fill a default subject line</p>
+        </div>
+      </div>
+
+      <!-- Template Content Section -->
+      <div class="bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-8 mb-6">
+        <h2 class="text-2xl font-bold text-white mb-6 flex items-center space-x-2">
+          <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          </svg>
+          <span>HTML Content</span>
+        </h2>
+
+        <div class="grid md:grid-cols-2 gap-4">
+          <!-- HTML Editor -->
+          <div>
+            <label for="{{ form.html_content.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
+              {{ form.html_content.label }} <span class="text-red-400">*</span>
+            </label>
+            {{ form.html_content }}
+            {% if form.html_content.errors %}
+              <p class="mt-2 text-sm text-red-400">{{ form.html_content.errors.0 }}</p>
+            {% endif %}
+            <p class="mt-1 text-xs text-gray-500">Write your email content using HTML tags</p>
+          </div>
+          
+          <!-- Live Preview -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-300 mb-2">Live Preview</label>
+            <div class="bg-slate-900/50 border border-slate-600/50 rounded-lg p-4 min-h-[200px]">
+              <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-600/50">
+                <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Preview</span>
+                <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+              </div>
+              <div id="htmlPreview" class="email-preview overflow-auto max-h-[400px]">
+                <p class="text-gray-500 italic">Your HTML content will appear here...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Template Status -->
+      <div class="bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-8 mb-6">
+        <h2 class="text-2xl font-bold text-white mb-6 flex items-center space-x-2">
+          <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span>Template Status</span>
+        </h2>
+
+        <div class="flex items-center space-x-3">
+          {{ form.is_active }}
+          <label for="{{ form.is_active.id_for_label }}" class="text-gray-300 cursor-pointer">
+            {{ form.is_active.label }}
+          </label>
+        </div>
+        {% if form.is_active.errors %}
+          <p class="mt-2 text-sm text-red-400">{{ form.is_active.errors.0 }}</p>
+        {% endif %}
+        <p class="mt-2 text-xs text-gray-500">Inactive templates won't appear in the campaign creation dropdown</p>
+      </div>
+
+      <!-- Example Templates -->
+      <div class="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-xl p-6 mb-8">
+        <h3 class="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
+          <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+          </svg>
+          <span>Template Ideas</span>
+        </h3>
+        <div class="grid md:grid-cols-2 gap-4 text-sm">
+          <div class="bg-slate-900/30 rounded-lg p-4">
+            <h4 class="font-semibold text-purple-400 mb-2">Newsletter Template</h4>
+            <p class="text-gray-300 text-xs mb-2">Name: "Monthly Newsletter"</p>
+            <code class="text-xs text-gray-400 block bg-slate-950/50 p-2 rounded overflow-x-auto">
+              &lt;h1&gt;Newsletter - [Month]&lt;/h1&gt;<br>
+              &lt;h2&gt;What's New&lt;/h2&gt;<br>
+              &lt;p&gt;Your content here...&lt;/p&gt;
+            </code>
+          </div>
+          <div class="bg-slate-900/30 rounded-lg p-4">
+            <h4 class="font-semibold text-purple-400 mb-2">Promotion Template</h4>
+            <p class="text-gray-300 text-xs mb-2">Name: "Special Offer"</p>
+            <code class="text-xs text-gray-400 block bg-slate-950/50 p-2 rounded overflow-x-auto">
+              &lt;h1&gt;🎉 Special Offer!&lt;/h1&gt;<br>
+              &lt;p&gt;&lt;strong&gt;Save 50%&lt;/strong&gt;&lt;/p&gt;<br>
+              &lt;p&gt;Limited time only...&lt;/p&gt;
+            </code>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center justify-between space-x-4">
+        <a href="{% url 'dashboard' %}" class="px-8 py-4 border-2 border-slate-700 hover:border-slate-600 text-white font-semibold rounded-xl transition-all duration-200">
+          Cancel
+        </a>
+        <button 
+          type="submit"
+          class="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold rounded-xl transition-all duration-200 transform hover:scale-[1.02] hover:shadow-xl hover:shadow-cyan-500/25 active:scale-[0.98] flex items-center space-x-2"
+        >
+          <span>Save Template</span>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Live HTML Preview
+  document.addEventListener('DOMContentLoaded', function() {
+    const htmlContentTextarea = document.getElementById('id_html_content');
+    const previewDiv = document.getElementById('htmlPreview');
+    
+    if (htmlContentTextarea && previewDiv) {
+      // Update preview on input
+      htmlContentTextarea.addEventListener('input', function() {
+        const htmlContent = this.value.trim();
+        
+        if (htmlContent) {
+          previewDiv.innerHTML = htmlContent;
+        } else {
+          previewDiv.innerHTML = '<p class="text-gray-500 italic">Your HTML content will appear here...</p>';
+        }
+      });
+      
+      // Initial preview if there's content
+      if (htmlContentTextarea.value.trim()) {
+        previewDiv.innerHTML = htmlContentTextarea.value;
+      }
+    }
+  });
+</script>
+{% endblock content %}

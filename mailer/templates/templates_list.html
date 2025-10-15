@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}Email Templates - BulkMailer{% endblock title %}
+
+{% block content %}
+<div class="min-h-screen">
+  <!-- Page Header -->
+  <div class="bg-slate-900/50 backdrop-blur-sm border-b border-slate-800">
+    <div class="container mx-auto px-6 py-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-white mb-2">Email Templates</h1>
+          <p class="text-gray-400">Manage your reusable email templates</p>
+        </div>
+        <div class="flex items-center space-x-4">
+          <a href="{% url 'create_template' %}" class="px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl transition inline-flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            <span>Create Template</span>
+          </a>
+          <a href="{% url 'dashboard' %}" class="text-gray-400 hover:text-cyan-400 transition inline-flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            <span>Back to Dashboard</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="container mx-auto px-6 py-12">
+    <!-- Statistics Cards -->
+    <div class="grid md:grid-cols-2 gap-6 mb-8">
+      <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+        </div>
+        <h3 class="text-2xl font-bold text-white mb-1">{{ total_templates }}</h3>
+        <p class="text-gray-400 text-sm">Total Templates</p>
+      </div>
+
+      <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-12 h-12 bg-cyan-500/20 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+        </div>
+        <h3 class="text-2xl font-bold text-white mb-1">{{ active_templates }}</h3>
+        <p class="text-gray-400 text-sm">Active Templates</p>
+      </div>
+    </div>
+
+    <!-- Templates Grid -->
+    {% if templates %}
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for template in templates %}
+          <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6 hover:border-green-500/50 transition group">
+            <div class="flex items-start justify-between mb-4">
+              <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center group-hover:bg-green-500/30 transition">
+                <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                </svg>
+              </div>
+              {% if template.is_active %}
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30">
+                  <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                  </svg>
+                  Active
+                </span>
+              {% else %}
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-500/20 text-gray-400 border border-gray-500/30">
+                  Inactive
+                </span>
+              {% endif %}
+            </div>
+
+            <h3 class="text-xl font-bold text-white mb-2">{{ template.name }}</h3>
+            
+            {% if template.description %}
+              <p class="text-gray-400 text-sm mb-3 line-clamp-2">{{ template.description }}</p>
+            {% else %}
+              <p class="text-gray-500 text-sm mb-3 italic">No description</p>
+            {% endif %}
+
+            {% if template.subject %}
+              <div class="mb-4 p-3 bg-slate-900/50 rounded-lg border border-slate-700">
+                <p class="text-xs text-gray-500 mb-1">Default Subject:</p>
+                <p class="text-sm text-gray-300 truncate">{{ template.subject }}</p>
+              </div>
+            {% endif %}
+
+            <div class="pt-4 border-t border-slate-700">
+              <div class="flex items-center justify-between text-xs text-gray-500 mb-3">
+                <span>Created {{ template.created_at|date:"M d, Y" }}</span>
+              </div>
+              
+              <div class="grid grid-cols-2 gap-2">
+                <a href="{% url 'template_detail' template.id %}" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition text-center block text-sm">
+                  View Details
+                </a>
+                <a href="{% url 'create_campaign' %}" class="px-4 py-2 bg-green-500/10 hover:bg-green-500/20 text-green-400 font-semibold rounded-lg transition text-center block text-sm">
+                  Use Template
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-12 text-center">
+        <svg class="w-16 h-16 text-gray-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+        </svg>
+        <h3 class="text-xl font-semibold text-white mb-2">No Templates Yet</h3>
+        <p class="text-gray-400 mb-6">Create reusable templates to speed up campaign creation</p>
+        <a href="{% url 'create_template' %}" class="inline-flex items-center px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl transition">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          Create First Template
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock content %}

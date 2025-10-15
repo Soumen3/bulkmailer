@@ -12,22 +12,53 @@
   <!-- Navigation -->
   <nav class="container mx-auto px-6 py-6">
     <div class="flex items-center justify-between">
-      <div class="flex items-center space-x-2">
+      <a href="{% url "home" %}" class="flex items-center space-x-2">
         <svg class="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
         </svg>
         <span class="text-2xl font-bold text-white">BulkMailer</span>
-      </div>
+      </a>
+      
+      <!-- Desktop Navigation -->
       <div class="hidden md:flex items-center space-x-8">
-        <a href="#features" class="text-gray-300 hover:text-cyan-400 transition">Features</a>
-        <a href="#about" class="text-gray-300 hover:text-cyan-400 transition">About</a>
-        <a href="#contact" class="text-gray-300 hover:text-cyan-400 transition">Contact</a>
         {% if user.is_authenticated %}
           <a href="{% url 'dashboard' %}" class="text-gray-300 hover:text-cyan-400 transition">Dashboard</a>
+          <a href="{% url 'contacts_list' %}" class="text-gray-300 hover:text-cyan-400 transition">Contacts</a>
+          <a href="{% url 'groups_list' %}" class="text-gray-300 hover:text-cyan-400 transition">Groups</a>
+          <a href="{% url 'templates_list' %}" class="text-gray-300 hover:text-cyan-400 transition">Templates</a>
           <a href="{% url 'logout' %}" class="text-gray-300 hover:text-red-400 transition">Logout</a>
         {% else %}
+          <a href="#features" class="text-gray-300 hover:text-cyan-400 transition">Features</a>
+          <a href="#about" class="text-gray-300 hover:text-cyan-400 transition">About</a>
+          <a href="#contact" class="text-gray-300 hover:text-cyan-400 transition">Contact</a>
           <a href="{% url 'login' %}" class="text-gray-300 hover:text-cyan-400 transition">Login</a>
           <a href="{% url 'signup' %}" class="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-2 rounded-lg transition font-semibold">Get Started Free</a>
+        {% endif %}
+      </div>
+      
+      <!-- Mobile Menu Button -->
+      <button id="mobileMenuBtn" class="md:hidden text-gray-300 hover:text-cyan-400 transition focus:outline-none">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+    
+    <!-- Mobile Navigation Menu -->
+    <div id="mobileMenu" class="hidden md:hidden mt-4 pb-4">
+      <div class="flex flex-col space-y-3">
+        {% if user.is_authenticated %}
+          <a href="{% url 'dashboard' %}" class="text-gray-300 hover:text-cyan-400 transition py-2 px-4 rounded-lg hover:bg-slate-800/50">Dashboard</a>
+          <a href="{% url 'contacts_list' %}" class="text-gray-300 hover:text-cyan-400 transition py-2 px-4 rounded-lg hover:bg-slate-800/50">Contacts</a>
+          <a href="{% url 'groups_list' %}" class="text-gray-300 hover:text-cyan-400 transition py-2 px-4 rounded-lg hover:bg-slate-800/50">Groups</a>
+          <a href="{% url 'templates_list' %}" class="text-gray-300 hover:text-cyan-400 transition py-2 px-4 rounded-lg hover:bg-slate-800/50">Templates</a>
+          <a href="{% url 'logout' %}" class="text-gray-300 hover:text-red-400 transition py-2 px-4 rounded-lg hover:bg-slate-800/50">Logout</a>
+        {% else %}
+          <a href="#features" class="text-gray-300 hover:text-cyan-400 transition py-2 px-4 rounded-lg hover:bg-slate-800/50">Features</a>
+          <a href="#about" class="text-gray-300 hover:text-cyan-400 transition py-2 px-4 rounded-lg hover:bg-slate-800/50">About</a>
+          <a href="#contact" class="text-gray-300 hover:text-cyan-400 transition py-2 px-4 rounded-lg hover:bg-slate-800/50">Contact</a>
+          <a href="{% url 'login' %}" class="text-gray-300 hover:text-cyan-400 transition py-2 px-4 rounded-lg hover:bg-slate-800/50">Login</a>
+          <a href="{% url 'signup' %}" class="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-lg transition font-semibold text-center">Get Started Free</a>
         {% endif %}
       </div>
     </div>
@@ -63,6 +94,18 @@
   {% block js %}{% endblock js %}
   
   <script>
+    // Mobile Menu Toggle
+    document.addEventListener('DOMContentLoaded', function() {
+      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      const mobileMenu = document.getElementById('mobileMenu');
+      
+      if (mobileMenuBtn && mobileMenu) {
+        mobileMenuBtn.addEventListener('click', function() {
+          mobileMenu.classList.toggle('hidden');
+        });
+      }
+    });
+    
     // Auto-hide notifications after 3 seconds
     document.addEventListener('DOMContentLoaded', function() {
       const notifications = document.querySelectorAll('.notification-message');

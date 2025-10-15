@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+{% block title %}Contact Groups - BulkMailer{% endblock title %}
+
+{% block content %}
+<div class="min-h-screen">
+  <!-- Page Header -->
+  <div class="bg-slate-900/50 backdrop-blur-sm border-b border-slate-800">
+    <div class="container mx-auto px-6 py-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-white mb-2">Contact Groups</h1>
+          <p class="text-gray-400">Organize your contacts into groups</p>
+        </div>
+        <div class="flex items-center space-x-4">
+          <a href="{% url 'create_group' %}" class="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-xl transition inline-flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            <span>Create Group</span>
+          </a>
+          <a href="{% url 'dashboard' %}" class="text-gray-400 hover:text-cyan-400 transition inline-flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            <span>Back to Dashboard</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="container mx-auto px-6 py-12">
+    <!-- Statistics Cards -->
+    <div class="grid md:grid-cols-2 gap-6 mb-8">
+      <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+            </svg>
+          </div>
+        </div>
+        <h3 class="text-2xl font-bold text-white mb-1">{{ total_groups }}</h3>
+        <p class="text-gray-400 text-sm">Total Groups</p>
+      </div>
+
+      <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+          </div>
+        </div>
+        <h3 class="text-2xl font-bold text-white mb-1">{{ total_contacts_in_groups }}</h3>
+        <p class="text-gray-400 text-sm">Contacts in Groups</p>
+      </div>
+    </div>
+
+    <!-- Groups Grid -->
+    {% if groups %}
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for group in groups %}
+          <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6 hover:border-orange-500/50 transition group">
+            <div class="flex items-start justify-between mb-4">
+              <div class="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center group-hover:bg-orange-500/30 transition">
+                <svg class="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+              </div>
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+                {{ group.contact_set.count }} contacts
+              </span>
+            </div>
+
+            <h3 class="text-xl font-bold text-white mb-2">{{ group.name }}</h3>
+            
+            {% if group.description %}
+              <p class="text-gray-400 text-sm mb-4 line-clamp-2">{{ group.description }}</p>
+            {% else %}
+              <p class="text-gray-500 text-sm mb-4 italic">No description</p>
+            {% endif %}
+
+            <div class="pt-4 border-t border-slate-700 flex items-center justify-between">
+              <span class="text-xs text-gray-500">Created {{ group.created_at|date:"M d, Y" }}</span>
+              <div class="flex items-center space-x-2">
+                <a href="{% url 'group_detail' group.id %}" class="text-orange-400 hover:text-orange-300 font-semibold text-sm transition inline-flex items-center space-x-1">
+                  <span>View Details</span>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                  </svg>
+                </a>
+                <button onclick="confirmDeleteGroup('{{ group.id }}', '{{ group.name }}', {{ group.contact_set.count }})" class="text-red-400 hover:text-red-300 font-semibold text-sm transition inline-flex items-center space-x-1 px-2 py-1 rounded-lg hover:bg-red-500/10">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                  <span>Delete</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-12 text-center">
+        <svg class="w-16 h-16 text-gray-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+        </svg>
+        <h3 class="text-xl font-semibold text-white mb-2">No Groups Yet</h3>
+        <p class="text-gray-400 mb-6">Create groups to organize your contacts</p>
+        <a href="{% url 'create_group' %}" class="inline-flex items-center px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-xl transition">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          Create First Group
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Delete Group Confirmation Modal -->
+<div id="deleteGroupModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+  <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-md w-full p-6 shadow-2xl">
+    <!-- Warning Icon -->
+    <div class="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-red-500/20 rounded-full">
+      <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+      </svg>
+    </div>
+    
+    <h3 class="text-xl font-bold text-white text-center mb-2">Delete Group Permanently?</h3>
+    <p id="deleteGroupModalMessage" class="text-gray-400 text-center mb-6"></p>
+    
+    <!-- Warning Box -->
+    <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6">
+      <div class="flex items-start space-x-3">
+        <div class="flex-shrink-0 text-red-400 text-lg">⚠️</div>
+        <div class="flex-1">
+          <p class="text-red-400 text-sm font-semibold mb-1">Warning: This action cannot be undone!</p>
+          <ul class="text-red-300/80 text-xs space-y-1">
+            <li>• The group will be permanently deleted</li>
+            <li>• Contacts in this group will be unlinked but NOT deleted</li>
+            <li>• You can reassign contacts to other groups later</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="flex space-x-3">
+      <button onclick="closeDeleteGroupModal()" class="flex-1 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition">
+        Cancel
+      </button>
+      <form id="deleteGroupForm" method="POST" class="flex-1">
+        {% csrf_token %}
+        <button type="submit" class="w-full px-4 py-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition inline-flex items-center justify-center space-x-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+          <span>Delete Group</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function confirmDeleteGroup(groupId, groupName, contactCount) {
+    const modal = document.getElementById('deleteGroupModal');
+    const message = document.getElementById('deleteGroupModalMessage');
+    const form = document.getElementById('deleteGroupForm');
+    
+    // Update message with group details
+    const contactText = contactCount === 1 ? '1 contact' : `${contactCount} contacts`;
+    message.innerHTML = `You are about to delete the group <strong class="text-white">"${groupName}"</strong> which contains <strong class="text-white">${contactText}</strong>.`;
+    
+    // Update form action using Django URL pattern
+    form.action = "{% url 'delete_group' 0 %}".replace('/0/', `/${groupId}/`);
+    
+    // Show modal
+    modal.classList.remove('hidden');
+  }
+  
+  function closeDeleteGroupModal() {
+    const modal = document.getElementById('deleteGroupModal');
+    modal.classList.add('hidden');
+  }
+  
+  // Close modal on ESC key
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      closeDeleteGroupModal();
+    }
+  });
+  
+  // Close modal when clicking outside
+  document.getElementById('deleteGroupModal')?.addEventListener('click', function(event) {
+    if (event.target === this) {
+      closeDeleteGroupModal();
+    }
+  });
+</script>
+{% endblock content %}

@@ -1,0 +1,341 @@
+{% extends "base.html" %}
+{% block title %}{{ template.name }} - BulkMailer{% endblock title %}
+
+{% block css %}
+<style>
+  /* Email Preview Styles */
+  .email-preview {
+    color: #e5e7eb;
+    line-height: 1.6;
+  }
+  
+  .email-preview h1 {
+    font-size: 2em;
+    font-weight: bold;
+    margin-top: 0.67em;
+    margin-bottom: 0.67em;
+    color: #fff;
+  }
+  
+  .email-preview h2 {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-top: 0.83em;
+    margin-bottom: 0.83em;
+    color: #fff;
+  }
+  
+  .email-preview h3 {
+    font-size: 1.17em;
+    font-weight: bold;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    color: #fff;
+  }
+  
+  .email-preview h4 {
+    font-size: 1em;
+    font-weight: bold;
+    margin-top: 1.33em;
+    margin-bottom: 1.33em;
+    color: #fff;
+  }
+  
+  .email-preview h5 {
+    font-size: 0.83em;
+    font-weight: bold;
+    margin-top: 1.67em;
+    margin-bottom: 1.67em;
+    color: #fff;
+  }
+  
+  .email-preview h6 {
+    font-size: 0.67em;
+    font-weight: bold;
+    margin-top: 2.33em;
+    margin-bottom: 2.33em;
+    color: #fff;
+  }
+  
+  .email-preview p {
+    margin-top: 1em;
+    margin-bottom: 1em;
+  }
+  
+  .email-preview strong, .email-preview b {
+    font-weight: bold;
+  }
+  
+  .email-preview em, .email-preview i {
+    font-style: italic;
+  }
+  
+  .email-preview u {
+    text-decoration: underline;
+  }
+  
+  .email-preview a {
+    color: #06b6d4;
+    text-decoration: underline;
+  }
+  
+  .email-preview a:hover {
+    color: #0891b2;
+  }
+  
+  .email-preview ul, .email-preview ol {
+    margin-top: 1em;
+    margin-bottom: 1em;
+    padding-left: 2em;
+  }
+  
+  .email-preview ul {
+    list-style-type: disc;
+  }
+  
+  .email-preview ol {
+    list-style-type: decimal;
+  }
+  
+  .email-preview li {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+  }
+  
+  .email-preview blockquote {
+    border-left: 4px solid #06b6d4;
+    padding-left: 1em;
+    margin: 1em 0;
+    color: #9ca3af;
+  }
+  
+  .email-preview code {
+    background-color: #1e293b;
+    padding: 0.2em 0.4em;
+    border-radius: 0.25rem;
+    font-family: monospace;
+    font-size: 0.875em;
+  }
+  
+  .email-preview pre {
+    background-color: #1e293b;
+    padding: 1em;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin: 1em 0;
+  }
+  
+  .email-preview pre code {
+    background-color: transparent;
+    padding: 0;
+  }
+  
+  .email-preview hr {
+    border: none;
+    border-top: 1px solid #475569;
+    margin: 2em 0;
+  }
+  
+  .email-preview img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin: 1em 0;
+  }
+  
+  .email-preview table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+  }
+  
+  .email-preview table th,
+  .email-preview table td {
+    border: 1px solid #475569;
+    padding: 0.5em;
+    text-align: left;
+  }
+  
+  .email-preview table th {
+    background-color: #1e293b;
+    font-weight: bold;
+  }
+</style>
+{% endblock css %}
+
+{% block content %}
+<div class="min-h-screen">
+  <!-- Page Header -->
+  <div class="bg-slate-900/50 backdrop-blur-sm border-b border-slate-800">
+    <div class="container mx-auto px-6 py-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="flex items-center space-x-3 mb-2">
+            <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+            <h1 class="text-3xl font-bold text-white">{{ template.name }}</h1>
+            {% if template.is_active %}
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30">
+                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
+                Active
+              </span>
+            {% else %}
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-500/20 text-gray-400 border border-gray-500/30">
+                Inactive
+              </span>
+            {% endif %}
+          </div>
+          {% if template.description %}
+            <p class="text-gray-400">{{ template.description }}</p>
+          {% else %}
+            <p class="text-gray-500 italic">No description provided</p>
+          {% endif %}
+        </div>
+        <div class="flex items-center space-x-4">
+          <a href="{% url 'create_campaign' %}" class="px-6 py-3 bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-xl transition inline-flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            </svg>
+            <span>Use in Campaign</span>
+          </a>
+          <a href="{% url 'templates_list' %}" class="text-gray-400 hover:text-cyan-400 transition inline-flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            <span>Back to Templates</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="container mx-auto px-6 py-12 max-w-7xl">
+    <!-- Template Information Card -->
+    <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-8 mb-8">
+      <h2 class="text-xl font-bold text-white mb-6">Template Information</h2>
+      
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <p class="text-sm text-gray-400 mb-2">Template Name</p>
+          <p class="text-lg text-white font-semibold">{{ template.name }}</p>
+        </div>
+        
+        <div>
+          <p class="text-sm text-gray-400 mb-2">Status</p>
+          <p class="text-lg text-white font-semibold">
+            {% if template.is_active %}
+              <span class="text-green-400">Active</span>
+            {% else %}
+              <span class="text-gray-400">Inactive</span>
+            {% endif %}
+          </p>
+        </div>
+        
+        <div>
+          <p class="text-sm text-gray-400 mb-2">Created Date</p>
+          <p class="text-lg text-white font-semibold">{{ template.created_at|date:"F d, Y" }}</p>
+        </div>
+        
+        <div>
+          <p class="text-sm text-gray-400 mb-2">Last Updated</p>
+          <p class="text-lg text-white font-semibold">{{ template.updated_at|date:"F d, Y" }}</p>
+        </div>
+      </div>
+
+      {% if template.description %}
+        <div class="mt-6 pt-6 border-t border-slate-700">
+          <p class="text-sm text-gray-400 mb-2">Description</p>
+          <p class="text-gray-300">{{ template.description }}</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Subject Line -->
+    {% if template.subject %}
+      <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-8 mb-8">
+        <h2 class="text-xl font-bold text-white mb-4">Default Subject Line</h2>
+        <div class="p-4 bg-slate-900/50 rounded-lg border border-cyan-500/30">
+          <p class="text-white text-lg">{{ template.subject }}</p>
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- HTML Content Preview -->
+    <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-8 mb-8">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-bold text-white">Email Preview</h2>
+        <div class="flex items-center space-x-2">
+          <button onclick="toggleView('preview')" id="previewBtn" class="px-4 py-2 bg-cyan-500/20 text-cyan-400 rounded-lg font-semibold transition hover:bg-cyan-500/30">
+            <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+            </svg>
+            Preview
+          </button>
+          <button onclick="toggleView('code')" id="codeBtn" class="px-4 py-2 bg-slate-700 text-gray-400 rounded-lg font-semibold transition hover:bg-slate-600">
+            <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+            </svg>
+            HTML Code
+          </button>
+        </div>
+      </div>
+
+      <!-- Preview View -->
+      <div id="previewView" class="bg-white rounded-lg p-8">
+        <div class="email-preview" style="color: #1f2937;">
+          {{ template.html_content|safe }}
+        </div>
+      </div>
+
+      <!-- Code View -->
+      <div id="codeView" class="hidden">
+        <div class="bg-slate-900/50 rounded-lg p-6 border border-slate-700 overflow-x-auto">
+          <pre class="text-gray-300 text-sm"><code>{{ template.html_content }}</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plain Text Version -->
+    {% if template.text_content %}
+      <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-8">
+        <h2 class="text-xl font-bold text-white mb-4">Plain Text Version</h2>
+        <div class="bg-slate-900/50 rounded-lg p-6 border border-slate-700">
+          <pre class="text-gray-300 whitespace-pre-wrap">{{ template.text_content }}</pre>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  function toggleView(view) {
+    const previewView = document.getElementById('previewView');
+    const codeView = document.getElementById('codeView');
+    const previewBtn = document.getElementById('previewBtn');
+    const codeBtn = document.getElementById('codeBtn');
+
+    if (view === 'preview') {
+      previewView.classList.remove('hidden');
+      codeView.classList.add('hidden');
+      previewBtn.classList.remove('bg-slate-700', 'text-gray-400');
+      previewBtn.classList.add('bg-cyan-500/20', 'text-cyan-400');
+      codeBtn.classList.add('bg-slate-700', 'text-gray-400');
+      codeBtn.classList.remove('bg-cyan-500/20', 'text-cyan-400');
+    } else {
+      previewView.classList.add('hidden');
+      codeView.classList.remove('hidden');
+      codeBtn.classList.remove('bg-slate-700', 'text-gray-400');
+      codeBtn.classList.add('bg-cyan-500/20', 'text-cyan-400');
+      previewBtn.classList.add('bg-slate-700', 'text-gray-400');
+      previewBtn.classList.remove('bg-cyan-500/20', 'text-cyan-400');
+    }
+  }
+</script>
+{% endblock content %}

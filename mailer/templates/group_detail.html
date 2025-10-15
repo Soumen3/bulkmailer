@@ -1,0 +1,369 @@
+{% extends "base.html" %}
+{% block title %}{{ group.name }} - BulkMailer{% endblock title %}
+
+{% block content %}
+<div class="min-h-screen">
+  <!-- Page Header -->
+  <div class="bg-slate-900/50 backdrop-blur-sm border-b border-slate-800">
+    <div class="container mx-auto px-6 py-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="flex items-center space-x-3 mb-2">
+            <div class="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              </svg>
+            </div>
+            <h1 class="text-3xl font-bold text-white">{{ group.name }}</h1>
+          </div>
+          {% if group.description %}
+            <p class="text-gray-400">{{ group.description }}</p>
+          {% else %}
+            <p class="text-gray-500 italic">No description provided</p>
+          {% endif %}
+        </div>
+        <div class="flex items-center space-x-4">
+          <button onclick="confirmDeleteGroup('{{ group.id }}', '{{ group.name }}', {{ total_contacts }})" class="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 border border-red-500/30 hover:border-red-500/50 font-semibold rounded-lg transition inline-flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            </svg>
+            <span>Delete Group</span>
+          </button>
+          <a href="{% url 'groups_list' %}" class="text-gray-400 hover:text-cyan-400 transition inline-flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            <span>Back to Groups</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="container mx-auto px-6 py-12">
+    <!-- Group Information Card -->
+    <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-8 mb-8">
+      <h2 class="text-xl font-bold text-white mb-6">Group Information</h2>
+      
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <p class="text-sm text-gray-400 mb-2">Group Name</p>
+          <p class="text-lg text-white font-semibold">{{ group.name }}</p>
+        </div>
+        
+        <div>
+          <p class="text-sm text-gray-400 mb-2">Total Contacts</p>
+          <p class="text-lg text-white font-semibold">{{ total_contacts }}</p>
+        </div>
+        
+        <div>
+          <p class="text-sm text-gray-400 mb-2">Active Contacts</p>
+          <p class="text-lg text-white font-semibold">{{ active_contacts }}</p>
+        </div>
+        
+        <div>
+          <p class="text-sm text-gray-400 mb-2">Created Date</p>
+          <p class="text-lg text-white font-semibold">{{ group.created_at|date:"F d, Y" }}</p>
+        </div>
+      </div>
+
+      {% if group.description %}
+        <div class="mt-6 pt-6 border-t border-slate-700">
+          <p class="text-sm text-gray-400 mb-2">Description</p>
+          <p class="text-gray-300">{{ group.description }}</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid md:grid-cols-3 gap-6 mb-8">
+      <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-12 h-12 bg-cyan-500/20 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+          </div>
+        </div>
+        <h3 class="text-2xl font-bold text-white mb-1">{{ total_contacts }}</h3>
+        <p class="text-gray-400 text-sm">Total Members</p>
+      </div>
+
+      <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+        </div>
+        <h3 class="text-2xl font-bold text-white mb-1">{{ active_contacts }}</h3>
+        <p class="text-gray-400 text-sm">Active Members</p>
+      </div>
+
+      <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+            </svg>
+          </div>
+        </div>
+        <h3 class="text-2xl font-bold text-white mb-1">{{ total_contacts|add:"-"|add:active_contacts }}</h3>
+        <p class="text-gray-400 text-sm">Inactive Members</p>
+      </div>
+    </div>
+
+    <!-- Contacts List -->
+    <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl overflow-hidden">
+      <div class="p-6 border-b border-slate-700 flex items-center justify-between">
+        <h2 class="text-xl font-bold text-white">Group Members</h2>
+        <a href="{% url 'import_contacts' %}" class="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white font-semibold rounded-lg transition text-sm inline-flex items-center space-x-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          <span>Add Contacts</span>
+        </a>
+      </div>
+
+      {% if contacts %}
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-slate-900/50">
+              <tr>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Email</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Name</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Added</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-700">
+              {% for contact in contacts %}
+                <tr class="hover:bg-slate-700/30 transition">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center space-x-2">
+                      <div class="w-8 h-8 bg-cyan-500/20 rounded-full flex items-center justify-center">
+                        <span class="text-cyan-400 text-xs font-semibold">{{ contact.email.0|upper }}</span>
+                      </div>
+                      <span class="text-white font-medium">{{ contact.email }}</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-gray-300">
+                    {% if contact.first_name or contact.last_name %}
+                      {{ contact.first_name }} {{ contact.last_name }}
+                    {% else %}
+                      <span class="text-gray-500 italic">No name</span>
+                    {% endif %}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    {% if contact.is_active %}
+                      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30">
+                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        Active
+                      </span>
+                    {% else %}
+                      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-500/20 text-gray-400 border border-gray-500/30">
+                        Inactive
+                      </span>
+                    {% endif %}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-gray-400 text-sm">
+                    {{ contact.created_at|date:"M d, Y" }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <button 
+                      onclick="confirmRemove('{{ contact.id }}', '{{ contact.email }}')"
+                      class="inline-flex items-center px-3 py-1 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-semibold rounded-lg transition text-sm border border-red-500/30 hover:border-red-500/50"
+                    >
+                      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                      </svg>
+                      Remove
+                    </button>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="p-12 text-center">
+          <svg class="w-16 h-16 text-gray-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          </svg>
+          <h3 class="text-xl font-semibold text-white mb-2">No Members Yet</h3>
+          <p class="text-gray-400 mb-6">This group doesn't have any contacts yet</p>
+          <a href="{% url 'import_contacts' %}" class="inline-flex items-center px-6 py-3 bg-purple-500 hover:bg-purple-600 text-white font-semibold rounded-xl transition">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Add Contacts
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="removeModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+  <div class="bg-slate-800 border border-slate-700 rounded-2xl p-8 max-w-md w-full shadow-2xl">
+    <div class="flex items-start space-x-4 mb-6">
+      <div class="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+        <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+        </svg>
+      </div>
+      <div class="flex-1">
+        <h3 class="text-xl font-bold text-white mb-2">Remove Contact from Group?</h3>
+        <p class="text-gray-400" id="modalMessage">
+          Are you sure you want to remove this contact from "{{ group.name }}"?
+        </p>
+        <p class="text-sm text-gray-500 mt-2">
+          The contact will not be deleted, just removed from this group.
+        </p>
+      </div>
+    </div>
+    
+    <div class="flex items-center justify-end space-x-3">
+      <button 
+        onclick="closeModal()"
+        class="px-6 py-3 border-2 border-slate-700 hover:border-slate-600 text-white font-semibold rounded-xl transition"
+      >
+        Cancel
+      </button>
+      <form id="removeForm" method="post" class="inline">
+        {% csrf_token %}
+        <button 
+          type="submit"
+          class="px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl transition"
+        >
+          Remove Contact
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function confirmRemove(contactId, email) {
+    const modal = document.getElementById('removeModal');
+    const form = document.getElementById('removeForm');
+    const message = document.getElementById('modalMessage');
+    
+    // Update message with contact email
+    message.innerHTML = `Are you sure you want to remove <strong class="text-white">${email}</strong> from "{{ group.name }}"?`;
+    
+    // Set form action
+    form.action = "{% url 'remove_contact_from_group' group.id 0 %}".replace('/0/', `/${contactId}/`);
+    
+    // Show modal
+    modal.classList.remove('hidden');
+  }
+  
+  function closeModal() {
+    const modal = document.getElementById('removeModal');
+    modal.classList.add('hidden');
+  }
+  
+  // Close modal on ESC key
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      closeModal();
+    }
+  });
+  
+  // Close modal when clicking outside
+  document.getElementById('removeModal').addEventListener('click', function(event) {
+    if (event.target === this) {
+      closeModal();
+    }
+  });
+  
+  // Delete Group Modal Functions
+  function confirmDeleteGroup(groupId, groupName, contactCount) {
+    const modal = document.getElementById('deleteGroupModal');
+    const message = document.getElementById('deleteGroupModalMessage');
+    const form = document.getElementById('deleteGroupForm');
+    
+    // Update message with group details
+    const contactText = contactCount === 1 ? '1 contact' : `${contactCount} contacts`;
+    message.innerHTML = `You are about to delete the group <strong class="text-white">"${groupName}"</strong> which contains <strong class="text-white">${contactText}</strong>.`;
+    
+    // Update form action using Django URL pattern
+    form.action = "{% url 'delete_group' 0 %}".replace('/0/', `/${groupId}/`);
+    
+    // Show modal
+    modal.classList.remove('hidden');
+  }
+  
+  function closeDeleteGroupModal() {
+    const modal = document.getElementById('deleteGroupModal');
+    modal.classList.add('hidden');
+  }
+  
+  // Close delete group modal on ESC key
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      closeDeleteGroupModal();
+    }
+  });
+  
+  // Close delete group modal when clicking outside
+  document.getElementById('deleteGroupModal')?.addEventListener('click', function(event) {
+    if (event.target === this) {
+      closeDeleteGroupModal();
+    }
+  });
+</script>
+
+<!-- Delete Group Confirmation Modal -->
+<div id="deleteGroupModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+  <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-md w-full p-6 shadow-2xl">
+    <!-- Warning Icon -->
+    <div class="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-red-500/20 rounded-full">
+      <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+      </svg>
+    </div>
+    
+    <h3 class="text-xl font-bold text-white text-center mb-2">Delete Group Permanently?</h3>
+    <p id="deleteGroupModalMessage" class="text-gray-400 text-center mb-6"></p>
+    
+    <!-- Warning Box -->
+    <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6">
+      <div class="flex items-start space-x-3">
+        <div class="flex-shrink-0 text-red-400 text-lg">⚠️</div>
+        <div class="flex-1">
+          <p class="text-red-400 text-sm font-semibold mb-1">Warning: This action cannot be undone!</p>
+          <ul class="text-red-300/80 text-xs space-y-1">
+            <li>• The group will be permanently deleted</li>
+            <li>• Contacts in this group will be unlinked but NOT deleted</li>
+            <li>• You can reassign contacts to other groups later</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="flex space-x-3">
+      <button onclick="closeDeleteGroupModal()" class="flex-1 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition">
+        Cancel
+      </button>
+      <form id="deleteGroupForm" action="{% url "delete_group" group.id %}" method="POST" class="flex-1">
+        {% csrf_token %}
+        <button type="submit" class="w-full px-4 py-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition inline-flex items-center justify-center space-x-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+          <span>Delete Group</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content %}

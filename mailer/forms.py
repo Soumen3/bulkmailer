@@ -234,7 +234,7 @@ class EmailTemplateForm(forms.ModelForm):
     
     class Meta:
         model = EmailTemplate
-        fields = ['name', 'description', 'subject', 'html_content', 'text_content']
+        fields = ['name', 'description', 'subject', 'html_content', 'text_content', 'is_active']
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': 'w-full px-4 py-3 bg-slate-900/50 border-2 border-slate-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-200',
@@ -259,6 +259,17 @@ class EmailTemplateForm(forms.ModelForm):
                 'rows': 8,
                 'placeholder': 'Plain text version'
             }),
+            'is_active': forms.CheckboxInput(attrs={
+                'class': 'w-5 h-5 text-cyan-500 bg-slate-900/50 border-2 border-slate-700 rounded focus:ring-cyan-500 focus:ring-2'
+            }),
+        }
+        labels = {
+            'name': 'Template Name',
+            'description': 'Description',
+            'subject': 'Subject Line',
+            'html_content': 'HTML Content',
+            'text_content': 'Plain Text Content',
+            'is_active': 'Active Template',
         }
 
     def __init__(self, *args, **kwargs):
@@ -266,6 +277,7 @@ class EmailTemplateForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['description'].required = False
         self.fields['text_content'].required = False
+        self.fields['subject'].required = False
 
     def save(self, commit=True):
         template = super().save(commit=False)

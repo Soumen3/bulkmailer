@@ -56,14 +56,22 @@
           </div>
         </div>
         
-        <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-          <a href="{% url 'signup' %}" class="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold transition transform hover:scale-105 shadow-lg shadow-cyan-500/50 text-center">
-            Get Started - It's Free!
-          </a>
-          <a href="{% url 'login' %}" class="border-2 border-gray-600 hover:border-cyan-400 text-white px-8 py-4 rounded-lg text-lg font-semibold transition text-center">
-            Sign In
-          </a>
-        </div>
+        {% if request.user.is_authenticated %}
+          <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+            <a href="{% url 'dashboard' %}" class="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold transition transform hover:scale-105 shadow-lg shadow-cyan-500/50 text-center">
+              Dashboard
+            </a>
+          </div>
+        {% else %}
+          <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+            <a href="{% url 'signup' %}" class="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold transition transform hover:scale-105 shadow-lg shadow-cyan-500/50 text-center">
+              Get Started - It's Free!
+            </a>
+            <a href="{% url 'login' %}" class="border-2 border-gray-600 hover:border-cyan-400 text-white px-8 py-4 rounded-lg text-lg font-semibold transition text-center">
+              Sign In
+            </a>
+          </div>
+        {% endif %}
         
         <!-- Trust Indicators -->
         <div class="mt-8 flex flex-wrap items-center gap-6">
