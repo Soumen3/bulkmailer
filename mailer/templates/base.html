@@ -1,0 +1,101 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{% endblock title %}</title>
+  {% tailwind_css %}
+  {% block css %}{% endblock css %}
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900 min-h-screen">
+  <!-- Navigation -->
+  <nav class="container mx-auto px-6 py-6">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <svg class="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+        </svg>
+        <span class="text-2xl font-bold text-white">BulkMailer</span>
+      </div>
+      <div class="hidden md:flex items-center space-x-8">
+        <a href="#features" class="text-gray-300 hover:text-cyan-400 transition">Features</a>
+        <a href="#about" class="text-gray-300 hover:text-cyan-400 transition">About</a>
+        <a href="#contact" class="text-gray-300 hover:text-cyan-400 transition">Contact</a>
+        {% if user.is_authenticated %}
+          <a href="{% url 'dashboard' %}" class="text-gray-300 hover:text-cyan-400 transition">Dashboard</a>
+          <a href="{% url 'logout' %}" class="text-gray-300 hover:text-red-400 transition">Logout</a>
+        {% else %}
+          <a href="{% url 'login' %}" class="text-gray-300 hover:text-cyan-400 transition">Login</a>
+          <a href="{% url 'signup' %}" class="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-2 rounded-lg transition font-semibold">Get Started Free</a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <!-- Notifications - Must be outside content block to appear on top -->
+  {% if messages %}
+    <div class="fixed bottom-4 right-4 z-[9999] space-y-2" id="notifications">
+      {% for message in messages %}
+        <div class="notification-message bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-6 py-4 rounded-xl shadow-2xl border border-cyan-400/30 backdrop-blur-sm animate-slide-in-right w-80">
+          <div class="flex items-center space-x-3">
+            {% if message.tags == 'success' %}
+              <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            {% elif message.tags == 'error' %}
+              <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            {% else %}
+              <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            {% endif %}
+            <span class="font-semibold">{{ message }}</span>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+  
+  {% block content %}{% endblock content %}
+  {% block js %}{% endblock js %}
+  
+  <script>
+    // Auto-hide notifications after 3 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+      const notifications = document.querySelectorAll('.notification-message');
+      notifications.forEach(function(notification) {
+        setTimeout(function() {
+          // Add fade out animation
+          notification.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+          notification.style.opacity = '0';
+          notification.style.transform = 'translateX(100%)';
+          
+          // Remove from DOM after animation
+          setTimeout(function() {
+            notification.remove();
+          }, 500);
+        }, 3000); // 3 seconds
+      });
+    });
+  </script>
+  
+  <style>
+    @keyframes slide-in-right {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    .animate-slide-in-right {
+      animation: slide-in-right 0.3s ease-out;
+    }
+  </style>
+</body>
+</html>

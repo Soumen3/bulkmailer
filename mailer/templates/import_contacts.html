@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Import Contacts - BulkMailer{% endblock title %}
+
+{% block content %}
+<div class="min-h-screen">
+  <!-- Page Header -->
+  <div class="bg-slate-900/50 backdrop-blur-sm border-b border-slate-800">
+    <div class="container mx-auto px-6 py-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-white mb-2">Import Contacts</h1>
+          <p class="text-gray-400">Upload a CSV file to bulk import your contacts</p>
+        </div>
+        <a href="{% url 'dashboard' %}" class="text-gray-400 hover:text-cyan-400 transition inline-flex items-center space-x-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          <span>Back to Dashboard</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="container mx-auto px-6 py-12">
+    <div class="max-w-3xl mx-auto">
+      
+      <!-- Instructions -->
+      <div class="bg-cyan-500/10 border border-cyan-500/30 rounded-2xl p-6 mb-8">
+        <h2 class="text-xl font-bold text-white mb-4 flex items-center space-x-2">
+          <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span>CSV File Format</span>
+        </h2>
+        <p class="text-gray-300 mb-4">Your CSV file should have the following columns:</p>
+        <ul class="list-disc list-inside text-gray-300 space-y-2 mb-4">
+          <li><strong class="text-cyan-400">email</strong> (required) - Email address of the contact</li>
+          <li><strong class="text-cyan-400">first_name</strong> (optional) - First name of the contact</li>
+          <li><strong class="text-cyan-400">last_name</strong> (optional) - Last name of the contact</li>
+        </ul>
+        
+        <div class="bg-slate-900/50 rounded-xl p-4 border border-slate-700">
+          <p class="text-sm text-gray-400 mb-2">Example CSV format:</p>
+          <code class="text-xs text-cyan-400 block">
+            email,first_name,last_name<br>
+            john@example.com,John,Doe<br>
+            jane@example.com,Jane,Smith<br>
+            contact@company.com,,
+          </code>
+        </div>
+      </div>
+
+      <!-- Upload Form -->
+      <div class="bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-8">
+        <h2 class="text-2xl font-bold text-white mb-6">Upload CSV File</h2>
+        
+        <form method="post" enctype="multipart/form-data" action="{% url 'import_contacts' %}">
+          {% csrf_token %}
+          
+          <!-- CSV File -->
+          <div class="mb-6">
+            <label for="{{ form.csv_file.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
+              {{ form.csv_file.label }} <span class="text-red-400">*</span>
+            </label>
+            {{ form.csv_file }}
+            {% if form.csv_file.errors %}
+              <p class="mt-2 text-sm text-red-400">{{ form.csv_file.errors.0 }}</p>
+            {% endif %}
+            {% if form.csv_file.help_text %}
+              <p class="mt-1 text-xs text-gray-500">{{ form.csv_file.help_text }}</p>
+            {% endif %}
+          </div>
+
+          <!-- Group Selection -->
+          <div class="mb-6">
+            <label for="{{ form.group.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
+              {{ form.group.label }}
+            </label>
+            {{ form.group }}
+            {% if form.group.errors %}
+              <p class="mt-2 text-sm text-red-400">{{ form.group.errors.0 }}</p>
+            {% endif %}
+            {% if form.group.help_text %}
+              <p class="mt-1 text-xs text-gray-500">{{ form.group.help_text }}</p>
+            {% endif %}
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex items-center justify-between space-x-4">
+            <a href="{% url 'dashboard' %}" class="px-8 py-4 border-2 border-slate-700 hover:border-slate-600 text-white font-semibold rounded-xl transition-all duration-200">
+              Cancel
+            </a>
+            <button 
+              type="submit"
+              class="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold rounded-xl transition-all duration-200 transform hover:scale-[1.02] hover:shadow-xl hover:shadow-cyan-500/25 active:scale-[0.98] flex items-center space-x-2"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+              </svg>
+              <span>Import Contacts</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock content %}

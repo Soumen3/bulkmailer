@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block title %}Create Contact Group - BulkMailer{% endblock title %}
+
+{% block content %}
+<div class="min-h-screen">
+  <!-- Page Header -->
+  <div class="bg-slate-900/50 backdrop-blur-sm border-b border-slate-800">
+    <div class="container mx-auto px-6 py-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-white mb-2">Create Contact Group</h1>
+          <p class="text-gray-400">Organize your contacts into groups for easier management</p>
+        </div>
+        <a href="{% url 'dashboard' %}" class="text-gray-400 hover:text-cyan-400 transition inline-flex items-center space-x-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          <span>Back to Dashboard</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="container mx-auto px-6 py-12">
+    <div class="max-w-2xl mx-auto">
+      
+      <!-- Info Box -->
+      <div class="bg-cyan-500/10 border border-cyan-500/30 rounded-2xl p-6 mb-8">
+        <h2 class="text-lg font-bold text-white mb-3 flex items-center space-x-2">
+          <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span>What are Contact Groups?</span>
+        </h2>
+        <p class="text-gray-300 text-sm">
+          Contact groups help you organize your contacts by category, such as "Newsletter Subscribers," "VIP Customers," or "Event Attendees." 
+          You can then send campaigns to entire groups instead of selecting individual contacts.
+        </p>
+      </div>
+
+      <!-- Create Group Form -->
+      <div class="bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-8">
+        <h2 class="text-2xl font-bold text-white mb-6 flex items-center space-x-2">
+          <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          </svg>
+          <span>Group Details</span>
+        </h2>
+        
+        <form method="post" action="{% url 'create_group' %}">
+          {% csrf_token %}
+          
+          <!-- Error Messages -->
+          {% if form.non_field_errors %}
+            <div class="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/50">
+              {% for error in form.non_field_errors %}
+                <div class="flex items-start space-x-2 text-red-400">
+                  <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                  </svg>
+                  <span class="text-sm font-medium">{{ error }}</span>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <!-- Group Name -->
+          <div class="mb-6">
+            <label for="{{ form.name.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
+              {{ form.name.label }} <span class="text-red-400">*</span>
+            </label>
+            {{ form.name }}
+            {% if form.name.errors %}
+              <p class="mt-2 text-sm text-red-400">{{ form.name.errors.0 }}</p>
+            {% endif %}
+            <p class="mt-1 text-xs text-gray-500">Choose a descriptive name for your group</p>
+          </div>
+
+          <!-- Description -->
+          <div class="mb-6">
+            <label for="{{ form.description.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
+              {{ form.description.label }}
+            </label>
+            {{ form.description }}
+            {% if form.description.errors %}
+              <p class="mt-2 text-sm text-red-400">{{ form.description.errors.0 }}</p>
+            {% endif %}
+            <p class="mt-1 text-xs text-gray-500">Optional brief description of this group</p>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex items-center justify-between space-x-4">
+            <a href="{% url 'dashboard' %}" class="px-8 py-4 border-2 border-slate-700 hover:border-slate-600 text-white font-semibold rounded-xl transition-all duration-200">
+              Cancel
+            </a>
+            <button 
+              type="submit"
+              class="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold rounded-xl transition-all duration-200 transform hover:scale-[1.02] hover:shadow-xl hover:shadow-cyan-500/25 active:scale-[0.98] flex items-center space-x-2"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              <span>Create Group</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Examples -->
+      <div class="mt-8 bg-slate-900/30 rounded-2xl p-6 border border-slate-700/50">
+        <h3 class="text-lg font-semibold text-white mb-4">Group Name Examples:</h3>
+        <div class="grid md:grid-cols-2 gap-3">
+          <div class="flex items-center space-x-2 text-gray-300">
+            <svg class="w-4 h-4 text-cyan-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Newsletter Subscribers</span>
+          </div>
+          <div class="flex items-center space-x-2 text-gray-300">
+            <svg class="w-4 h-4 text-cyan-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">VIP Customers</span>
+          </div>
+          <div class="flex items-center space-x-2 text-gray-300">
+            <svg class="w-4 h-4 text-cyan-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Event Attendees 2025</span>
+          </div>
+          <div class="flex items-center space-x-2 text-gray-300">
+            <svg class="w-4 h-4 text-cyan-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Product Launch List</span>
+          </div>
+          <div class="flex items-center space-x-2 text-gray-300">
+            <svg class="w-4 h-4 text-cyan-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Beta Testers</span>
+          </div>
+          <div class="flex items-center space-x-2 text-gray-300">
+            <svg class="w-4 h-4 text-cyan-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm">Weekly Updates</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock content %}
