@@ -19,5 +19,7 @@ urlpatterns=[
   path('template/create/', views.create_template_view, name='create_template'),
   path('templates/', views.templates_list_view, name='templates_list'),
   path('template/<int:template_id>/', views.template_detail_view, name='template_detail'),
+  path('template/<int:template_id>/delete/', views.delete_template_view, name='delete_template'),
+  path('template/<int:template_id>/toggle/', views.toggle_template_status_view, name='toggle_template_status'),
   path('campaign/<int:campaign_id>/send/', views.send_campaign_view, name='send_campaign'),
 ]

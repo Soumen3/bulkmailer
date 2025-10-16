@@ -6,23 +6,24 @@
   <!-- Page Header -->
   <div class="bg-slate-900/50 backdrop-blur-sm border-b border-slate-800">
     <div class="container mx-auto px-6 py-8">
-      <div class="flex items-center justify-between">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 class="text-3xl font-bold text-white mb-2">Email Templates</h1>
           <p class="text-gray-400">Manage your reusable email templates</p>
         </div>
-        <div class="flex items-center space-x-4">
-          <a href="{% url 'create_template' %}" class="px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl transition inline-flex items-center space-x-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-            </svg>
-            <span>Create Template</span>
-          </a>
-          <a href="{% url 'dashboard' %}" class="text-gray-400 hover:text-cyan-400 transition inline-flex items-center space-x-2">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+          <!-- Back button appears first on mobile, last on larger screens -->
+          <a href="{% url 'dashboard' %}" class="order-1 sm:order-2 text-gray-400 hover:text-cyan-400 transition inline-flex items-center justify-center space-x-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
             </svg>
             <span>Back to Dashboard</span>
+          </a>
+          <a href="{% url 'create_template' %}" class="order-2 sm:order-1 px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl transition inline-flex items-center justify-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            <span>Create Template</span>
           </a>
         </div>
       </div>
@@ -103,13 +104,16 @@
                 <span>Created {{ template.created_at|date:"M d, Y" }}</span>
               </div>
               
-              <div class="grid grid-cols-2 gap-2">
-                <a href="{% url 'template_detail' template.id %}" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition text-center block text-sm">
-                  View Details
+              <div class="grid grid-cols-3 gap-2">
+                <a href="{% url 'template_detail' template.id %}" class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition text-center block text-sm">
+                  View
                 </a>
-                <a href="{% url 'create_campaign' %}" class="px-4 py-2 bg-green-500/10 hover:bg-green-500/20 text-green-400 font-semibold rounded-lg transition text-center block text-sm">
-                  Use Template
+                <a href="{% url 'create_campaign' %}" class="px-3 py-2 bg-green-500/10 hover:bg-green-500/20 text-green-400 font-semibold rounded-lg transition text-center block text-sm">
+                  Use
                 </a>
+                <button onclick="confirmDeleteTemplate('{{ template.id }}', '{{ template.name|escapejs }}')" class="px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 font-semibold rounded-lg transition text-sm">
+                  Delete
+                </button>
               </div>
             </div>
           </div>
@@ -132,4 +136,86 @@
     {% endif %}
   </div>
 </div>
+
+<!-- Delete Template Confirmation Modal -->
+<div id="deleteTemplateModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+  <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-md w-full p-6 shadow-2xl">
+    <!-- Warning Icon -->
+    <div class="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-red-500/20 rounded-full">
+      <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+      </svg>
+    </div>
+    
+    <h3 class="text-xl font-bold text-white text-center mb-2">Delete Template Permanently?</h3>
+    <p id="deleteTemplateModalMessage" class="text-gray-400 text-center mb-6"></p>
+    
+    <!-- Warning Box -->
+    <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6">
+      <div class="flex items-start space-x-3">
+        <div class="flex-shrink-0 text-red-400 text-lg">⚠️</div>
+        <div class="flex-1">
+          <p class="text-red-400 text-sm font-semibold mb-1">Warning: This action cannot be undone!</p>
+          <ul class="text-red-300/80 text-xs space-y-1">
+            <li>• The template will be permanently deleted</li>
+            <li>• This template can no longer be used in campaigns</li>
+            <li>• Existing campaigns using this template will not be affected</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="flex space-x-3">
+      <button onclick="closeDeleteTemplateModal()" class="flex-1 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition">
+        Cancel
+      </button>
+      <form id="deleteTemplateForm" method="POST" class="flex-1">
+        {% csrf_token %}
+        <button type="submit" class="w-full px-4 py-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition inline-flex items-center justify-center space-x-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+          <span>Delete Template</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function confirmDeleteTemplate(templateId, templateName) {
+    const modal = document.getElementById('deleteTemplateModal');
+    const message = document.getElementById('deleteTemplateModalMessage');
+    const form = document.getElementById('deleteTemplateForm');
+    
+    // Update message with template details
+    message.innerHTML = `You are about to delete the template <strong class="text-white">"${templateName}"</strong>.`;
+    
+    // Update form action using Django URL pattern
+    form.action = "{% url 'delete_template' 0 %}".replace('/0/', `/${templateId}/`);
+    
+    // Show modal
+    modal.classList.remove('hidden');
+  }
+  
+  function closeDeleteTemplateModal() {
+    const modal = document.getElementById('deleteTemplateModal');
+    modal.classList.add('hidden');
+  }
+  
+  // Close modal on ESC key
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      closeDeleteTemplateModal();
+    }
+  });
+  
+  // Close modal when clicking outside
+  document.getElementById('deleteTemplateModal')?.addEventListener('click', function(event) {
+    if (event.target === this) {
+      closeDeleteTemplateModal();
+    }
+  });
+</script>
 {% endblock content %}

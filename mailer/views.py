@@ -3,6 +3,9 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.conf import settings
+from django.core.serializers.json import DjangoJSONEncoder
+import json
 from .forms import EmailCampaignForm, CSVImportForm, ContactGroupForm, EmailTemplateForm
 from .models import EmailCampaign, Contact, ContactGroup, EmailTemplate
 from .email_utils import send_campaign_emails, import_contacts_from_csv
@@ -72,13 +75,35 @@ def create_campaign_view(request):
     if request.method == 'POST':
         form = EmailCampaignForm(request.POST, user=request.user)
         if form.is_valid():
-            campaign = form.save()
-            messages.success(request, f'Campaign "{campaign.name}" created successfully!')
+            campaign = form.save(commit=False)
+            
+            # Set from_email and from_name from settings
+            campaign.from_email = settings.EMAIL_HOST_USER
+            campaign.from_name = getattr(settings, 'DEFAULT_FROM_NAME', 'Bulk Mailer')
+            campaign.save()
+            form.save_m2m()  # Save many-to-many relationships
+            
+            # Automatically send the campaign
+            send_individually = request.POST.get('send_method') == 'individual'
+            result = send_campaign_emails(campaign, send_individually=send_individually)
+            
+            if result['success']:
+                messages.success(request, f'Campaign "{campaign.name}" created and sent successfully! {result["message"]}')
+            else:
+                messages.warning(request, f'Campaign "{campaign.name}" created but sending failed: {result["message"]}')
+            
             return redirect('dashboard')
     else:
         form = EmailCampaignForm(user=request.user)
     
-    return render(request, 'create_campaign.html', {'form': form})
+    # Get all active templates for the user to pass to JavaScript
+    templates = EmailTemplate.objects.filter(user=request.user, is_active=True).values('id', 'name', 'subject', 'html_content', 'text_content')
+    templates_json = json.dumps(list(templates))
+    
+    return render(request, 'create_campaign.html', {
+        'form': form,
+        'templates_json': templates_json
+    })
 
 @login_required(login_url='login')
 def import_contacts_view(request):
@@ -143,8 +168,11 @@ def send_campaign_view(request, campaign_id):
     campaign = get_object_or_404(EmailCampaign, id=campaign_id, user=request.user)
     
     if request.method == 'POST':
+        # Check if user wants to send individually or via BCC
+        send_individually = request.POST.get('send_method') == 'individual'
+        
         # Send the campaign
-        result = send_campaign_emails(campaign)
+        result = send_campaign_emails(campaign, send_individually=send_individually)
         
         if result['success']:
             messages.success(request, result['message'])
@@ -153,8 +181,15 @@ def send_campaign_view(request, campaign_id):
         
         return redirect('dashboard')
     
+    # Calculate recipients count for confirmation page
+    total_recipients = campaign.get_total_recipients()
+    
     # Show confirmation page
-    return render(request, 'send_campaign.html', {'campaign': campaign})
+    context = {
+        'campaign': campaign,
+        'total_recipients': total_recipients,
+    }
+    return render(request, 'send_campaign.html', context)
 
 @login_required(login_url='login')
 def contacts_list_view(request):
@@ -286,3 +321,40 @@ def delete_group_view(request, group_id):
     
     # If GET request, show confirmation (though we'll use modal)
     return redirect('groups_list')
+
+@login_required(login_url='login')
+def delete_template_view(request, template_id):
+    """Delete an email template permanently"""
+    template = get_object_or_404(EmailTemplate, id=template_id, user=request.user)
+    
+    if request.method == 'POST':
+        template_name = template.name
+        
+        # Delete the template
+        template.delete()
+        
+        messages.success(request, f'Template "{template_name}" has been permanently deleted.')
+        return redirect('templates_list')
+    
+    # If GET request, show confirmation (though we'll use modal)
+    return redirect('templates_list')
+
+
+@login_required
+def toggle_template_status_view(request, template_id):
+    """Toggle template active/inactive status"""
+    template = get_object_or_404(EmailTemplate, id=template_id, user=request.user)
+    
+    if request.method == 'POST':
+        # Toggle the is_active status
+        template.is_active = not template.is_active
+        template.save()
+        
+        status = "activated" if template.is_active else "deactivated"
+        messages.success(request, f'Template "{template.name}" has been {status}.')
+        
+        return redirect('template_detail', template_id=template.id)
+    
+    # If GET request, redirect back
+    return redirect('template_detail', template_id=template.id)
+

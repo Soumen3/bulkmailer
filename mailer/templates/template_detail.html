@@ -3,162 +3,17 @@
 
 {% block css %}
 <style>
-  /* Email Preview Styles */
-  .email-preview {
-    color: #e5e7eb;
-    line-height: 1.6;
+  /* Iframe preview styling with complete isolation */
+  #htmlPreviewFrame {
+    transition: height 0.3s ease;
+    isolation: isolate; /* CSS isolation property */
+    contain: layout style paint; /* CSS containment for performance and isolation */
   }
   
-  .email-preview h1 {
-    font-size: 2em;
-    font-weight: bold;
-    margin-top: 0.67em;
-    margin-bottom: 0.67em;
-    color: #fff;
-  }
-  
-  .email-preview h2 {
-    font-size: 1.5em;
-    font-weight: bold;
-    margin-top: 0.83em;
-    margin-bottom: 0.83em;
-    color: #fff;
-  }
-  
-  .email-preview h3 {
-    font-size: 1.17em;
-    font-weight: bold;
-    margin-top: 1em;
-    margin-bottom: 1em;
-    color: #fff;
-  }
-  
-  .email-preview h4 {
-    font-size: 1em;
-    font-weight: bold;
-    margin-top: 1.33em;
-    margin-bottom: 1.33em;
-    color: #fff;
-  }
-  
-  .email-preview h5 {
-    font-size: 0.83em;
-    font-weight: bold;
-    margin-top: 1.67em;
-    margin-bottom: 1.67em;
-    color: #fff;
-  }
-  
-  .email-preview h6 {
-    font-size: 0.67em;
-    font-weight: bold;
-    margin-top: 2.33em;
-    margin-bottom: 2.33em;
-    color: #fff;
-  }
-  
-  .email-preview p {
-    margin-top: 1em;
-    margin-bottom: 1em;
-  }
-  
-  .email-preview strong, .email-preview b {
-    font-weight: bold;
-  }
-  
-  .email-preview em, .email-preview i {
-    font-style: italic;
-  }
-  
-  .email-preview u {
-    text-decoration: underline;
-  }
-  
-  .email-preview a {
-    color: #06b6d4;
-    text-decoration: underline;
-  }
-  
-  .email-preview a:hover {
-    color: #0891b2;
-  }
-  
-  .email-preview ul, .email-preview ol {
-    margin-top: 1em;
-    margin-bottom: 1em;
-    padding-left: 2em;
-  }
-  
-  .email-preview ul {
-    list-style-type: disc;
-  }
-  
-  .email-preview ol {
-    list-style-type: decimal;
-  }
-  
-  .email-preview li {
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
-  }
-  
-  .email-preview blockquote {
-    border-left: 4px solid #06b6d4;
-    padding-left: 1em;
-    margin: 1em 0;
-    color: #9ca3af;
-  }
-  
-  .email-preview code {
-    background-color: #1e293b;
-    padding: 0.2em 0.4em;
-    border-radius: 0.25rem;
-    font-family: monospace;
-    font-size: 0.875em;
-  }
-  
-  .email-preview pre {
-    background-color: #1e293b;
-    padding: 1em;
-    border-radius: 0.5rem;
-    overflow-x: auto;
-    margin: 1em 0;
-  }
-  
-  .email-preview pre code {
-    background-color: transparent;
-    padding: 0;
-  }
-  
-  .email-preview hr {
-    border: none;
-    border-top: 1px solid #475569;
-    margin: 2em 0;
-  }
-  
-  .email-preview img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 0.5rem;
-    margin: 1em 0;
-  }
-  
-  .email-preview table {
-    border-collapse: collapse;
-    width: 100%;
-    margin: 1em 0;
-  }
-  
-  .email-preview table th,
-  .email-preview table td {
-    border: 1px solid #475569;
-    padding: 0.5em;
-    text-align: left;
-  }
-  
-  .email-preview table th {
-    background-color: #1e293b;
-    font-weight: bold;
+  /* Ensure no styles leak from this page */
+  .email-preview-container {
+    all: initial; /* Reset all properties */
+    display: block;
   }
 </style>
 {% endblock css %}
@@ -168,7 +23,7 @@
   <!-- Page Header -->
   <div class="bg-slate-900/50 backdrop-blur-sm border-b border-slate-800">
     <div class="container mx-auto px-6 py-8">
-      <div class="flex items-center justify-between">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
           <div class="flex items-center space-x-3 mb-2">
             <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
@@ -196,14 +51,41 @@
             <p class="text-gray-500 italic">No description provided</p>
           {% endif %}
         </div>
-        <div class="flex items-center space-x-4">
-          <a href="{% url 'create_campaign' %}" class="px-6 py-3 bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-xl transition inline-flex items-center space-x-2">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+          <button onclick="confirmDeleteTemplate('{{ template.id }}', '{{ template.name|escapejs }}')" class="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 border border-red-500/30 hover:border-red-500/50 font-semibold rounded-lg transition inline-flex items-center justify-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            </svg>
+            <span>Delete Template</span>
+          </button>
+          
+          <!-- Toggle Active/Inactive Button -->
+          <form method="POST" action="{% url 'toggle_template_status' template.id %}" class="w-full sm:w-auto">
+            {% csrf_token %}
+            {% if template.is_active %}
+              <button type="submit" class="w-full px-4 py-2 bg-gray-500/10 hover:bg-gray-500/20 text-gray-400 hover:text-gray-300 border border-gray-500/30 hover:border-gray-500/50 font-semibold rounded-lg transition inline-flex items-center justify-center space-x-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                </svg>
+                <span>Deactivate</span>
+              </button>
+            {% else %}
+              <button type="submit" class="w-full px-4 py-2 bg-green-500/10 hover:bg-green-500/20 text-green-400 hover:text-green-300 border border-green-500/30 hover:border-green-500/50 font-semibold rounded-lg transition inline-flex items-center justify-center space-x-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>Activate</span>
+              </button>
+            {% endif %}
+          </form>
+          
+          <a href="{% url 'create_campaign' %}" class="px-6 py-3 bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-xl transition inline-flex items-center justify-center space-x-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
             </svg>
             <span>Use in Campaign</span>
           </a>
-          <a href="{% url 'templates_list' %}" class="text-gray-400 hover:text-cyan-400 transition inline-flex items-center space-x-2">
+          <a href="{% url 'templates_list' %}" class="text-gray-400 hover:text-cyan-400 transition inline-flex items-center justify-center space-x-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
             </svg>
@@ -288,9 +170,19 @@
       </div>
 
       <!-- Preview View -->
-      <div id="previewView" class="bg-white rounded-lg p-8">
-        <div class="email-preview" style="color: #1f2937;">
-          {{ template.html_content|safe }}
+      <div id="previewView" class="bg-slate-900/50 rounded-lg p-4">
+        <!-- Preview Note -->
+        <div class="mb-2 p-2 bg-blue-500/10 border border-blue-500/30 rounded text-xs text-blue-300">
+          <strong>Note:</strong> Email preview is isolated to prevent styling conflicts with the page.
+        </div>
+        
+        <div class="email-preview-container">
+          <iframe 
+            id="htmlPreviewFrame" 
+            class="w-full min-h-[400px] bg-white rounded border-0"
+            sandbox=""
+            style="height: 600px; display: block;"
+          ></iframe>
         </div>
       </div>
 
@@ -315,6 +207,65 @@
 </div>
 
 <script>
+  // Load HTML content into isolated iframe on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    const previewFrame = document.getElementById('htmlPreviewFrame');
+    const htmlContent = `{{ template.html_content|escapejs }}`;
+    
+    if (previewFrame && htmlContent) {
+      // Use srcdoc attribute for complete isolation
+      const fullHTML = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            /* Reset and base styles for email preview */
+            * {
+              box-sizing: border-box;
+            }
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+              padding: 20px;
+              margin: 0;
+              color: #333;
+              background-color: #fff;
+              line-height: 1.6;
+              font-size: 14px;
+            }
+            img {
+              max-width: 100%;
+              height: auto;
+            }
+            table {
+              border-collapse: collapse;
+            }
+          </style>
+        </head>
+        <body>
+          ${htmlContent}
+        </body>
+        </html>
+      `;
+      
+      previewFrame.setAttribute('srcdoc', fullHTML);
+      
+      // Adjust height after content loads
+      setTimeout(() => {
+        try {
+          if (previewFrame.contentWindow && previewFrame.contentWindow.document) {
+            const contentHeight = previewFrame.contentWindow.document.body.scrollHeight;
+            previewFrame.style.height = Math.max(400, Math.min(contentHeight + 40, 1200)) + 'px';
+          }
+        } catch (e) {
+          // Sandboxed iframe might not allow access, use default height
+          previewFrame.style.height = '600px';
+        }
+      }, 200);
+    }
+  });
+
   function toggleView(view) {
     const previewView = document.getElementById('previewView');
     const codeView = document.getElementById('codeView');
@@ -337,5 +288,85 @@
       previewBtn.classList.remove('bg-cyan-500/20', 'text-cyan-400');
     }
   }
+  
+  function confirmDeleteTemplate(templateId, templateName) {
+    const modal = document.getElementById('deleteTemplateModal');
+    const message = document.getElementById('deleteTemplateModalMessage');
+    const form = document.getElementById('deleteTemplateForm');
+    
+    // Update message with template details
+    message.innerHTML = `You are about to delete the template <strong class="text-white">"${templateName}"</strong>.`;
+    
+    // Update form action using Django URL pattern
+    form.action = "{% url 'delete_template' 0 %}".replace('/0/', `/${templateId}/`);
+    
+    // Show modal
+    modal.classList.remove('hidden');
+  }
+  
+  function closeDeleteTemplateModal() {
+    const modal = document.getElementById('deleteTemplateModal');
+    modal.classList.add('hidden');
+  }
+  
+  // Close modal on ESC key
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      closeDeleteTemplateModal();
+    }
+  });
+  
+  // Close modal when clicking outside
+  document.getElementById('deleteTemplateModal')?.addEventListener('click', function(event) {
+    if (event.target === this) {
+      closeDeleteTemplateModal();
+    }
+  });
 </script>
+
+<!-- Delete Template Confirmation Modal -->
+<div id="deleteTemplateModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+  <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-md w-full p-6 shadow-2xl">
+    <!-- Warning Icon -->
+    <div class="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-red-500/20 rounded-full">
+      <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+      </svg>
+    </div>
+    
+    <h3 class="text-xl font-bold text-white text-center mb-2">Delete Template Permanently?</h3>
+    <p id="deleteTemplateModalMessage" class="text-gray-400 text-center mb-6"></p>
+    
+    <!-- Warning Box -->
+    <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6">
+      <div class="flex items-start space-x-3">
+        <div class="flex-shrink-0 text-red-400 text-lg">⚠️</div>
+        <div class="flex-1">
+          <p class="text-red-400 text-sm font-semibold mb-1">Warning: This action cannot be undone!</p>
+          <ul class="text-red-300/80 text-xs space-y-1">
+            <li>• The template will be permanently deleted</li>
+            <li>• This template can no longer be used in campaigns</li>
+            <li>• Existing campaigns using this template will not be affected</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="flex space-x-3">
+      <button onclick="closeDeleteTemplateModal()" class="flex-1 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition">
+        Cancel
+      </button>
+      <form id="deleteTemplateForm" method="POST" class="flex-1">
+        {% csrf_token %}
+        <button type="submit" class="w-full px-4 py-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition inline-flex items-center justify-center space-x-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+          <span>Delete Template</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
 {% endblock content %}

@@ -3,162 +3,33 @@
 
 {% block css %}
 <style>
-  /* Email Preview Styles */
-  .email-preview {
-    color: #e5e7eb;
-    line-height: 1.6;
+  /* Iframe preview styling with complete isolation */
+  #htmlPreviewFrame {
+    transition: height 0.3s ease;
+    isolation: isolate; /* CSS isolation property */
+    contain: layout style paint; /* CSS containment for performance and isolation */
   }
   
-  .email-preview h1 {
-    font-size: 2em;
-    font-weight: bold;
-    margin-top: 0.67em;
-    margin-bottom: 0.67em;
-    color: #fff;
+  /* Notification animation */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
   
-  .email-preview h2 {
-    font-size: 1.5em;
-    font-weight: bold;
-    margin-top: 0.83em;
-    margin-bottom: 0.83em;
-    color: #fff;
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
   }
   
-  .email-preview h3 {
-    font-size: 1.17em;
-    font-weight: bold;
-    margin-top: 1em;
-    margin-bottom: 1em;
-    color: #fff;
-  }
-  
-  .email-preview h4 {
-    font-size: 1em;
-    font-weight: bold;
-    margin-top: 1.33em;
-    margin-bottom: 1.33em;
-    color: #fff;
-  }
-  
-  .email-preview h5 {
-    font-size: 0.83em;
-    font-weight: bold;
-    margin-top: 1.67em;
-    margin-bottom: 1.67em;
-    color: #fff;
-  }
-  
-  .email-preview h6 {
-    font-size: 0.67em;
-    font-weight: bold;
-    margin-top: 2.33em;
-    margin-bottom: 2.33em;
-    color: #fff;
-  }
-  
-  .email-preview p {
-    margin-top: 1em;
-    margin-bottom: 1em;
-  }
-  
-  .email-preview strong, .email-preview b {
-    font-weight: bold;
-  }
-  
-  .email-preview em, .email-preview i {
-    font-style: italic;
-  }
-  
-  .email-preview u {
-    text-decoration: underline;
-  }
-  
-  .email-preview a {
-    color: #06b6d4;
-    text-decoration: underline;
-  }
-  
-  .email-preview a:hover {
-    color: #0891b2;
-  }
-  
-  .email-preview ul, .email-preview ol {
-    margin-top: 1em;
-    margin-bottom: 1em;
-    padding-left: 2em;
-  }
-  
-  .email-preview ul {
-    list-style-type: disc;
-  }
-  
-  .email-preview ol {
-    list-style-type: decimal;
-  }
-  
-  .email-preview li {
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
-  }
-  
-  .email-preview blockquote {
-    border-left: 4px solid #06b6d4;
-    padding-left: 1em;
-    margin: 1em 0;
-    color: #9ca3af;
-  }
-  
-  .email-preview code {
-    background-color: #1e293b;
-    padding: 0.2em 0.4em;
-    border-radius: 0.25rem;
-    font-family: monospace;
-    font-size: 0.875em;
-  }
-  
-  .email-preview pre {
-    background-color: #1e293b;
-    padding: 1em;
-    border-radius: 0.5rem;
-    overflow-x: auto;
-    margin: 1em 0;
-  }
-  
-  .email-preview pre code {
-    background-color: transparent;
-    padding: 0;
-  }
-  
-  .email-preview hr {
-    border: none;
-    border-top: 1px solid #475569;
-    margin: 2em 0;
-  }
-  
-  .email-preview img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 0.5rem;
-    margin: 1em 0;
-  }
-  
-  .email-preview table {
-    border-collapse: collapse;
-    width: 100%;
-    margin: 1em 0;
-  }
-  
-  .email-preview table th,
-  .email-preview table td {
-    border: 1px solid #475569;
-    padding: 0.5em;
-    text-align: left;
-  }
-  
-  .email-preview table th {
-    background-color: #1e293b;
-    font-weight: bold;
+  /* Ensure no styles leak from this page */
+  .email-preview-container {
+    all: initial; /* Reset all properties */
+    display: block;
   }
 </style>
 {% endblock css %}
@@ -187,6 +58,31 @@
   <div class="container mx-auto px-6 py-12">
     <form method="post" action="{% url 'create_campaign' %}" class="max-w-7xl mx-auto">
       {% csrf_token %}
+      
+      <!-- Auto-Send Warning Banner -->
+      <div class="mb-8 bg-gradient-to-r from-orange-500/20 to-red-500/20 border-2 border-orange-500/50 rounded-xl p-6 shadow-lg">
+        <div class="flex items-start space-x-4">
+          <div class="flex-shrink-0">
+            <div class="w-12 h-12 bg-orange-500/30 rounded-full flex items-center justify-center">
+              <svg class="w-6 h-6 text-orange-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-xl font-bold text-orange-400 mb-2">⚡ Auto-Send Enabled</h3>
+            <p class="text-white mb-3">
+              <strong>Emails will be sent IMMEDIATELY</strong> after you click "Create & Send Campaign" - there is no separate confirmation step!
+            </p>
+            <ul class="space-y-1 text-sm text-orange-200">
+              <li>✓ Double-check all recipients and content before submitting</li>
+              <li>✓ Review the HTML preview on the right</li>
+              <li>✓ Test with yourself or a test group first if unsure</li>
+              <li>✓ Once sent, emails cannot be recalled</li>
+            </ul>
+          </div>
+        </div>
+      </div>
       
       <!-- Error Messages -->
       {% if form.non_field_errors %}
@@ -282,9 +178,21 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                   </svg>
                 </div>
-                <div id="htmlPreview" class="email-preview overflow-auto max-h-[400px]">
-                  <p class="text-gray-500 italic">Your HTML content will appear here...</p>
+                
+                <!-- Preview Note -->
+                <div class="mb-2 p-2 bg-blue-500/10 border border-blue-500/30 rounded text-xs text-blue-300">
+                  <strong>Note:</strong> Email preview is isolated to prevent styling conflicts with the page.
                 </div>
+                
+                <div class="email-preview-container">
+                  <iframe 
+                    id="htmlPreviewFrame" 
+                    class="w-full min-h-[400px] bg-white rounded border-0"
+                    sandbox=""
+                    style="height: 400px; display: block;"
+                  ></iframe>
+                </div>
+                <div id="htmlPreview" class="hidden"></div>
               </div>
             </div>
           </div>
@@ -305,47 +213,32 @@
         </div>
       </div>
 
-      <!-- Sender Information Section -->
+      <!-- Sender & Additional Recipients Section -->
       <div class="bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-8 mb-6">
         <h2 class="text-2xl font-bold text-white mb-6 flex items-center space-x-2">
           <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
           </svg>
-          <span>Sender Information</span>
+          <span>Sender & Additional Recipients</span>
         </h2>
 
-        <div class="grid md:grid-cols-2 gap-6">
-          <!-- From Email -->
-          <div>
-            <label for="{{ form.from_email.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
-              {{ form.from_email.label }} <span class="text-red-400">*</span>
-            </label>
-            {{ form.from_email }}
-            {% if form.from_email.errors %}
-              <p class="mt-2 text-sm text-red-400">{{ form.from_email.errors.0 }}</p>
-            {% endif %}
-            {% if form.from_email.help_text %}
-              <p class="mt-1 text-xs text-gray-500">{{ form.from_email.help_text }}</p>
-            {% endif %}
-          </div>
-
-          <!-- From Name -->
-          <div>
-            <label for="{{ form.from_name.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
-              {{ form.from_name.label }}
-            </label>
-            {{ form.from_name }}
-            {% if form.from_name.errors %}
-              <p class="mt-2 text-sm text-red-400">{{ form.from_name.errors.0 }}</p>
-            {% endif %}
-            {% if form.from_name.help_text %}
-              <p class="mt-1 text-xs text-gray-500">{{ form.from_name.help_text }}</p>
-            {% endif %}
+        <!-- Sender Info Notice -->
+        <div class="mb-6 p-4 rounded-xl bg-blue-500/10 border border-blue-500/30">
+          <div class="flex items-start space-x-3">
+            <svg class="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+            </svg>
+            <div>
+              <h3 class="text-sm font-semibold text-blue-300 mb-1">Sender Automatically Set</h3>
+              <p class="text-sm text-blue-200">
+                All emails will be sent from the configured email address in your system settings. You don't need to specify the sender.
+              </p>
+            </div>
           </div>
         </div>
 
         <!-- Reply To -->
-        <div class="mt-6">
+        <div class="mb-6">
           <label for="{{ form.reply_to.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
             {{ form.reply_to.label }}
           </label>
@@ -357,6 +250,85 @@
             <p class="mt-1 text-xs text-gray-500">{{ form.reply_to.help_text }}</p>
           {% endif %}
         </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <!-- CC Manual Emails -->
+          <div>
+            <label for="{{ form.cc.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
+              {{ form.cc.label }}
+            </label>
+            {{ form.cc }}
+            {% if form.cc.errors %}
+              <p class="mt-2 text-sm text-red-400">{{ form.cc.errors.0 }}</p>
+            {% endif %}
+            {% if form.cc.help_text %}
+              <p class="mt-1 text-xs text-gray-500">{{ form.cc.help_text }}</p>
+            {% endif %}
+          </div>
+
+          <!-- BCC Manual Emails -->
+          <div>
+            <label for="{{ form.bcc.id_for_label }}" class="block text-sm font-semibold text-gray-300 mb-2">
+              {{ form.bcc.label }}
+            </label>
+            {{ form.bcc }}
+            {% if form.bcc.errors %}
+              <p class="mt-2 text-sm text-red-400">{{ form.bcc.errors.0 }}</p>
+            {% endif %}
+            {% if form.bcc.help_text %}
+              <p class="mt-1 text-xs text-gray-500">{{ form.bcc.help_text }}</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- CC and BCC Groups -->
+        <div class="grid md:grid-cols-2 gap-6 mt-6">
+          <!-- CC Groups -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-300 mb-3">
+              {{ form.cc_groups.label }}
+            </label>
+            <div class="space-y-2 max-h-48 overflow-y-auto bg-slate-900/30 rounded-xl p-4 border border-slate-700">
+              {% for choice in form.cc_groups %}
+                <label class="flex items-center space-x-3 p-2 hover:bg-slate-800/50 rounded-lg cursor-pointer transition">
+                  {{ choice.tag }}
+                  <span class="text-gray-300">{{ choice.choice_label }}</span>
+                </label>
+              {% empty %}
+                <p class="text-gray-500 text-sm">No groups available</p>
+              {% endfor %}
+            </div>
+            {% if form.cc_groups.errors %}
+              <p class="mt-2 text-sm text-red-400">{{ form.cc_groups.errors.0 }}</p>
+            {% endif %}
+            {% if form.cc_groups.help_text %}
+              <p class="mt-1 text-xs text-gray-500">{{ form.cc_groups.help_text }}</p>
+            {% endif %}
+          </div>
+
+          <!-- BCC Groups -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-300 mb-3">
+              {{ form.bcc_groups.label }}
+            </label>
+            <div class="space-y-2 max-h-48 overflow-y-auto bg-slate-900/30 rounded-xl p-4 border border-slate-700">
+              {% for choice in form.bcc_groups %}
+                <label class="flex items-center space-x-3 p-2 hover:bg-slate-800/50 rounded-lg cursor-pointer transition">
+                  {{ choice.tag }}
+                  <span class="text-gray-300">{{ choice.choice_label }}</span>
+                </label>
+              {% empty %}
+                <p class="text-gray-500 text-sm">No groups available</p>
+              {% endfor %}
+            </div>
+            {% if form.bcc_groups.errors %}
+              <p class="mt-2 text-sm text-red-400">{{ form.bcc_groups.errors.0 }}</p>
+            {% endif %}
+            {% if form.bcc_groups.help_text %}
+              <p class="mt-1 text-xs text-gray-500">{{ form.bcc_groups.help_text }}</p>
+            {% endif %}
+          </div>
+        </div>
       </div>
 
       <!-- Recipients Section -->
@@ -365,10 +337,12 @@
           <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
           </svg>
-          <span>Select Recipients</span>
+          <span>Main Recipients (To)</span>
         </h2>
 
-        <p class="text-gray-400 mb-6">Choose at least one contact group or individual contact</p>
+        <p class="text-gray-400 mb-6">
+          Select main recipients for the "To" field (optional if using CC/BCC)
+        </p>
 
         <!-- Contact Groups -->
         <div class="mb-6">
@@ -387,6 +361,9 @@
           </div>
           {% if form.contact_groups.errors %}
             <p class="mt-2 text-sm text-red-400">{{ form.contact_groups.errors.0 }}</p>
+          {% endif %}
+          {% if form.contact_groups.help_text %}
+            <p class="mt-1 text-xs text-gray-500">{{ form.contact_groups.help_text }}</p>
           {% endif %}
         </div>
 
@@ -407,6 +384,9 @@
           </div>
           {% if form.individual_contacts.errors %}
             <p class="mt-2 text-sm text-red-400">{{ form.individual_contacts.errors.0 }}</p>
+          {% endif %}
+          {% if form.individual_contacts.help_text %}
+            <p class="mt-1 text-xs text-gray-500">{{ form.individual_contacts.help_text }}</p>
           {% endif %}
         </div>
       </div>
@@ -434,6 +414,61 @@
         </div>
       </div>
 
+      <!-- Sending Method Selection -->
+      <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-8 mb-8">
+        <h3 class="text-xl font-bold text-white mb-4 flex items-center space-x-2">
+          <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+          </svg>
+          <span>Sending Method</span>
+        </h3>
+        <p class="text-gray-400 mb-6 text-sm">Campaign will be sent automatically after creation</p>
+        
+        <div class="space-y-3">
+          <label class="flex items-start p-4 border-2 border-slate-700 hover:border-cyan-500/50 rounded-lg cursor-pointer transition group">
+            <input type="radio" name="send_method" value="bcc" checked class="mt-1 text-cyan-500 focus:ring-cyan-500">
+            <div class="ml-3 flex-1">
+              <div class="flex items-center space-x-2">
+                <span class="font-semibold text-white group-hover:text-cyan-400 transition">Standard Mode (Recommended)</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+                  Fast
+                </span>
+              </div>
+              <div class="text-sm text-gray-400 mt-1">
+                Each recipient receives their own individual email with their address in the "To" field. Faster than personalized mode. Best for newsletters and announcements.
+              </div>
+            </div>
+          </label>
+          
+          <label class="flex items-start p-4 border-2 border-slate-700 hover:border-purple-500/50 rounded-lg cursor-pointer transition group">
+            <input type="radio" name="send_method" value="individual" class="mt-1 text-purple-500 focus:ring-purple-500">
+            <div class="ml-3 flex-1">
+              <div class="flex items-center space-x-2">
+                <span class="font-semibold text-white group-hover:text-purple-400 transition">Personalized Mode</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                  Personalized
+                </span>
+              </div>
+              <div class="text-sm text-gray-400 mt-1">
+                Each recipient receives a separate email with personalized content. Supports placeholders: <code class="px-1 py-0.5 bg-slate-900/50 rounded text-purple-300">{{first_name}}</code>, <code class="px-1 py-0.5 bg-slate-900/50 rounded text-purple-300">{{last_name}}</code>, <code class="px-1 py-0.5 bg-slate-900/50 rounded text-purple-300">{{full_name}}</code>, <code class="px-1 py-0.5 bg-slate-900/50 rounded text-purple-300">{{email}}</code>. Takes longer for large lists.
+              </div>
+            </div>
+          </label>
+        </div>
+        
+        <!-- Info Box -->
+        <div class="mt-4 bg-orange-500/10 border border-orange-500/30 rounded-lg p-4">
+          <div class="flex items-start space-x-3">
+            <svg class="w-5 h-5 text-orange-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div class="text-sm text-orange-300">
+              <strong>Auto-Send Notice:</strong> Emails will be sent immediately after you click "Create & Send Campaign". Make sure all details are correct before submitting.
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Action Buttons -->
       <div class="flex items-center justify-between space-x-4">
         <a href="{% url 'dashboard' %}" class="px-8 py-4 border-2 border-slate-700 hover:border-slate-600 text-white font-semibold rounded-xl transition-all duration-200">
@@ -443,9 +478,9 @@
           type="submit"
           class="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold rounded-xl transition-all duration-200 transform hover:scale-[1.02] hover:shadow-xl hover:shadow-cyan-500/25 active:scale-[0.98] flex items-center space-x-2"
         >
-          <span>Create Campaign</span>
+          <span>Create & Send Campaign</span>
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
           </svg>
         </button>
       </div>
@@ -453,27 +488,242 @@
   </div>
 </div>
 
+{{ templates_json|json_script:"templates-data" }}
+
 <script>
-  // Live HTML Preview
+  // Template data from backend
+  let templatesData = [];
+  
+  // Try to load template data
+  document.addEventListener('DOMContentLoaded', function() {
+    try {
+      const dataElement = document.getElementById('templates-data');
+      console.log('Data element found:', dataElement); // Debug
+      
+      if (dataElement) {
+        const textContent = dataElement.textContent;
+        console.log('Raw text content:', textContent); // Debug
+        templatesData = JSON.parse(textContent);
+        console.log('Parsed templates data:', templatesData); // Debug
+      } else {
+        console.error('❌ Template data element with id "templates-data" not found');
+      }
+    } catch (e) {
+      console.error('❌ Error parsing template data:', e);
+    }
+    
+    // Template Auto-fill functionality
+    const templateSelect = document.getElementById('id_use_template');
+    const subjectField = document.getElementById('id_subject');
+    const htmlContentField = document.getElementById('id_html_content');
+    const textContentField = document.getElementById('id_text_content');
+    
+    console.log('✓ Template select found:', !!templateSelect);
+    console.log('✓ Subject field found:', !!subjectField);
+    console.log('✓ HTML field found:', !!htmlContentField);
+    console.log('✓ Text field found:', !!textContentField);
+    
+    if (!templateSelect) {
+      console.error('❌ Template select element not found!');
+      return;
+    }
+    
+    if (!htmlContentField) {
+      console.error('❌ HTML content field not found!');
+      return;
+    }
+    
+    // Add change event listener
+    templateSelect.addEventListener('change', function(e) {
+      const selectedValue = this.value;
+      const selectedTemplateId = parseInt(selectedValue);
+      
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('Template dropdown changed!');
+      console.log('Selected value:', selectedValue);
+      console.log('Selected ID:', selectedTemplateId);
+      console.log('Available templates:', templatesData);
+      
+      if (!selectedTemplateId || isNaN(selectedTemplateId)) {
+        console.log('No template selected or invalid ID, clearing fields');
+        // Clear fields when no template selected
+        if (subjectField) subjectField.value = '';
+        if (htmlContentField) {
+          htmlContentField.value = '';
+          htmlContentField.dispatchEvent(new Event('input'));
+        }
+        if (textContentField) textContentField.value = '';
+        return;
+      }
+      
+      // Find the selected template
+      const selectedTemplate = templatesData.find(t => t.id === selectedTemplateId);
+      console.log('Found template:', selectedTemplate);
+      
+      if (!selectedTemplate) {
+        console.error('❌ Template not found in data array!');
+        return;
+      }
+      
+      // Auto-fill the fields
+      console.log('Starting to fill fields...');
+      
+      if (subjectField) {
+        const oldSubject = subjectField.value;
+        subjectField.value = selectedTemplate.subject || '';
+        console.log('✓ Subject: "' + oldSubject + '" → "' + subjectField.value + '"');
+      }
+      
+      if (htmlContentField) {
+        const oldHtml = htmlContentField.value.substring(0, 50);
+        htmlContentField.value = selectedTemplate.html_content || '';
+        console.log('✓ HTML: "' + oldHtml + '..." → "' + htmlContentField.value.substring(0, 50) + '..."');
+        console.log('✓ HTML length:', htmlContentField.value.length, 'characters');
+        
+        // Trigger input event to update preview
+        const inputEvent = new Event('input', { bubbles: true });
+        htmlContentField.dispatchEvent(inputEvent);
+        console.log('✓ Triggered input event for preview update');
+      }
+      
+      if (textContentField) {
+        const oldText = textContentField.value.substring(0, 50);
+        textContentField.value = selectedTemplate.text_content || '';
+        console.log('✓ Text: "' + oldText + '..." → "' + textContentField.value.substring(0, 50) + '..."');
+      }
+      
+      // Show success notification
+      const notification = document.createElement('div');
+      notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in';
+      notification.innerHTML = `
+        <div class="flex items-center space-x-2">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+          </svg>
+          <span>Template "${selectedTemplate.name}" loaded!</span>
+        </div>
+      `;
+      document.body.appendChild(notification);
+      console.log('✓ Notification shown');
+      
+      // Remove notification after 3 seconds
+      setTimeout(() => {
+        notification.remove();
+        console.log('✓ Notification removed');
+      }, 3000);
+      
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    });
+    
+    console.log('✅ Template auto-fill event listener registered');
+  });
+  
+  // Live HTML Preview with Complete Isolation
   document.addEventListener('DOMContentLoaded', function() {
     const htmlContentTextarea = document.getElementById('id_html_content');
-    const previewDiv = document.getElementById('htmlPreview');
+    const previewFrame = document.getElementById('htmlPreviewFrame');
     
-    if (htmlContentTextarea && previewDiv) {
-      // Update preview on input
-      htmlContentTextarea.addEventListener('input', function() {
-        const htmlContent = this.value.trim();
-        
-        if (htmlContent) {
-          previewDiv.innerHTML = htmlContent;
+    if (htmlContentTextarea && previewFrame) {
+      // Function to update iframe preview using srcdoc for complete isolation
+      function updatePreview(htmlContent) {
+        if (htmlContent.trim()) {
+          // Use srcdoc attribute for complete isolation - no cross-origin issues
+          const fullHTML = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>
+                /* Reset and base styles for email preview */
+                * {
+                  box-sizing: border-box;
+                }
+                body {
+                  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+                  padding: 20px;
+                  margin: 0;
+                  color: #333;
+                  background-color: #fff;
+                  line-height: 1.6;
+                  font-size: 14px;
+                }
+                img {
+                  max-width: 100%;
+                  height: auto;
+                }
+                table {
+                  border-collapse: collapse;
+                }
+              </style>
+            </head>
+            <body>
+              ${htmlContent}
+            </body>
+            </html>
+          `;
+          
+          previewFrame.setAttribute('srcdoc', fullHTML);
+          
+          // Adjust height after a short delay to let content render
+          setTimeout(() => {
+            try {
+              // Try to get content height if possible
+              if (previewFrame.contentWindow && previewFrame.contentWindow.document) {
+                const contentHeight = previewFrame.contentWindow.document.body.scrollHeight;
+                previewFrame.style.height = Math.max(400, Math.min(contentHeight + 40, 800)) + 'px';
+              }
+            } catch (e) {
+              // Sandboxed iframe might not allow access, use default height
+              previewFrame.style.height = '600px';
+            }
+          }, 200);
         } else {
-          previewDiv.innerHTML = '<p class="text-gray-500 italic">Your HTML content will appear here...</p>';
+          // Show empty state
+          const emptyHTML = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <meta charset="UTF-8">
+              <style>
+                body {
+                  font-family: Arial, sans-serif;
+                  padding: 20px;
+                  margin: 0;
+                  color: #9ca3af;
+                  background-color: #fff;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  min-height: 400px;
+                  font-style: italic;
+                }
+              </style>
+            </head>
+            <body>
+              <p>Your HTML content will appear here...</p>
+            </body>
+            </html>
+          `;
+          previewFrame.setAttribute('srcdoc', emptyHTML);
+          previewFrame.style.height = '400px';
         }
+      }
+      
+      // Update preview on input with debouncing for performance
+      let debounceTimer;
+      htmlContentTextarea.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          updatePreview(this.value);
+        }, 300); // 300ms debounce
       });
       
       // Initial preview if there's content
       if (htmlContentTextarea.value.trim()) {
-        previewDiv.innerHTML = htmlContentTextarea.value;
+        updatePreview(htmlContentTextarea.value);
+      } else {
+        updatePreview('');
       }
     }
   });

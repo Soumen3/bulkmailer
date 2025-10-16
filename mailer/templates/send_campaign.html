@@ -47,8 +47,35 @@
           
           <div class="flex justify-between">
             <span class="text-gray-400">Total Recipients:</span>
-            <span class="text-cyan-400 font-bold text-lg">{{ campaign.get_total_recipients }}</span>
+            <span class="text-cyan-400 font-bold text-lg">{{ total_recipients }}</span>
           </div>
+        </div>
+      </div>
+
+      <!-- Sending Method Selection -->
+      <div class="bg-slate-900/50 rounded-xl p-6 mb-6 border border-slate-700">
+        <h3 class="text-lg font-bold text-white mb-4">Select Sending Method</h3>
+        
+        <div class="space-y-3">
+          <label class="flex items-start p-4 border-2 border-slate-700 hover:border-cyan-500/50 rounded-lg cursor-pointer transition group">
+            <input type="radio" name="send_method" value="bcc" checked class="mt-1 text-cyan-500 focus:ring-cyan-500">
+            <div class="ml-3">
+              <div class="font-semibold text-white group-hover:text-cyan-400 transition">BCC Mode (Recommended)</div>
+              <div class="text-sm text-gray-400 mt-1">
+                All recipients receive the same email via BCC. Faster and uses less resources. Email addresses are hidden from each other.
+              </div>
+            </div>
+          </label>
+          
+          <label class="flex items-start p-4 border-2 border-slate-700 hover:border-purple-500/50 rounded-lg cursor-pointer transition group">
+            <input type="radio" name="send_method" value="individual" class="mt-1 text-purple-500 focus:ring-purple-500">
+            <div class="ml-3">
+              <div class="font-semibold text-white group-hover:text-purple-400 transition">Individual Mode (Personalized)</div>
+              <div class="text-sm text-gray-400 mt-1">
+                Each recipient receives a separate email. Supports personalization with {{first_name}}, {{last_name}}, {{full_name}}, {{email}} placeholders. Takes longer for large lists.
+              </div>
+            </div>
+          </label>
         </div>
       </div>
 
@@ -61,9 +88,9 @@
           <div>
             <h3 class="text-orange-400 font-semibold mb-1">Important Notice</h3>
             <ul class="text-gray-300 text-sm space-y-1">
-              <li>• All recipients will receive the email via BCC (their addresses will be hidden)</li>
               <li>• This action cannot be undone</li>
               <li>• Make sure you have tested the email content</li>
+              <li>• Check your SMTP limits to avoid being blocked</li>
             </ul>
           </div>
         </div>

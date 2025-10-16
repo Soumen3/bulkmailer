@@ -22,9 +22,11 @@ class EmailCampaignForm(forms.ModelForm):
         fields = [
             'name',
             'subject',
-            'from_email',
-            'from_name',
             'reply_to',
+            'cc',
+            'bcc',
+            'cc_groups',
+            'bcc_groups',
             'html_content',
             'text_content',
             'contact_groups',
@@ -40,21 +42,27 @@ class EmailCampaignForm(forms.ModelForm):
                 'class': 'w-full px-4 py-3 bg-slate-900/50 border-2 border-slate-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-200',
                 'placeholder': 'Email subject line'
             }),
-            'from_email': forms.EmailInput(attrs={
-                'class': 'w-full px-4 py-3 bg-slate-900/50 border-2 border-slate-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-200',
-                'placeholder': 'sender@yourdomain.com'
-            }),
-            'from_name': forms.TextInput(attrs={
-                'class': 'w-full px-4 py-3 bg-slate-900/50 border-2 border-slate-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-200',
-                'placeholder': 'Your Name or Company'
-            }),
             'reply_to': forms.EmailInput(attrs={
                 'class': 'w-full px-4 py-3 bg-slate-900/50 border-2 border-slate-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-200',
                 'placeholder': 'reply@yourdomain.com (optional)'
             }),
+            'cc': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-3 bg-slate-900/50 border-2 border-slate-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-200',
+                'placeholder': 'email1@example.com, email2@example.com (optional)'
+            }),
+            'bcc': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-3 bg-slate-900/50 border-2 border-slate-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-200',
+                'placeholder': 'email1@example.com, email2@example.com (optional)'
+            }),
+            'cc_groups': forms.CheckboxSelectMultiple(attrs={
+                'class': 'text-cyan-500 focus:ring-cyan-500'
+            }),
+            'bcc_groups': forms.CheckboxSelectMultiple(attrs={
+                'class': 'text-cyan-500 focus:ring-cyan-500'
+            }),
             'html_content': forms.Textarea(attrs={
                 'class': 'w-full px-4 py-3 bg-slate-900/50 border-2 border-slate-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-200',
-                'rows': 12,
+                'style': 'min-height: 480px; resize: vertical;',
                 'placeholder': 'Enter your email HTML content here...'
             }),
             'text_content': forms.Textarea(attrs={
@@ -77,9 +85,11 @@ class EmailCampaignForm(forms.ModelForm):
         labels = {
             'name': 'Campaign Name',
             'subject': 'Email Subject',
-            'from_email': 'From Email Address',
-            'from_name': 'From Name',
             'reply_to': 'Reply-To Address',
+            'cc': 'CC (Manual Email Addresses)',
+            'bcc': 'BCC (Manual Email Addresses)',
+            'cc_groups': 'CC Groups',
+            'bcc_groups': 'BCC Groups',
             'html_content': 'Email Content (HTML)',
             'text_content': 'Plain Text Version',
             'contact_groups': 'Select Contact Groups',
@@ -87,9 +97,13 @@ class EmailCampaignForm(forms.ModelForm):
             'scheduled_at': 'Schedule Send Time',
         }
         help_texts = {
-            'from_email': 'The email address that will appear as the sender',
-            'from_name': 'The name that will appear as the sender',
             'reply_to': 'Where replies will be sent (optional)',
+            'cc': 'Additional individual email addresses for CC (comma-separated)',
+            'bcc': 'Additional individual email addresses for BCC (comma-separated)',
+            'cc_groups': 'Contact groups to receive CC (visible to all recipients)',
+            'bcc_groups': 'Contact groups to receive BCC (hidden from recipients)',
+            'contact_groups': 'Main recipients in the "To" field (optional if using CC/BCC)',
+            'individual_contacts': 'Individual contacts in the "To" field (optional if using CC/BCC)',
             'html_content': 'You can use HTML tags to format your email',
             'text_content': 'Fallback for email clients that don\'t support HTML',
             'scheduled_at': 'Leave empty to send immediately, or schedule for later',
@@ -104,23 +118,55 @@ class EmailCampaignForm(forms.ModelForm):
             self.fields['contact_groups'].queryset = ContactGroup.objects.filter(user=self.user)
             self.fields['individual_contacts'].queryset = Contact.objects.filter(user=self.user, is_active=True)
             self.fields['use_template'].queryset = EmailTemplate.objects.filter(user=self.user, is_active=True)
+            self.fields['cc_groups'].queryset = ContactGroup.objects.filter(user=self.user)
+            self.fields['bcc_groups'].queryset = ContactGroup.objects.filter(user=self.user)
         
         # Make some fields optional for better UX
+        self.fields['html_content'].required = False
         self.fields['text_content'].required = False
         self.fields['reply_to'].required = False
-        self.fields['from_name'].required = False
+        self.fields['cc'].required = False
+        self.fields['bcc'].required = False
         self.fields['scheduled_at'].required = False
 
     def clean(self):
         cleaned_data = super().clean()
         contact_groups = cleaned_data.get('contact_groups')
         individual_contacts = cleaned_data.get('individual_contacts')
+        cc = cleaned_data.get('cc', '')
+        bcc = cleaned_data.get('bcc', '')
+        cc_groups = cleaned_data.get('cc_groups')
+        bcc_groups = cleaned_data.get('bcc_groups')
         
-        # Ensure at least one recipient is selected
-        if not contact_groups and not individual_contacts:
+        # Check if there are any recipients at all (main TO, CC, or BCC)
+        has_main_recipients = bool(contact_groups or individual_contacts)
+        has_cc_recipients = bool(cc.strip() or cc_groups)
+        has_bcc_recipients = bool(bcc.strip() or bcc_groups)
+        
+        # Ensure at least one recipient is selected (can be TO, CC, or BCC)
+        if not (has_main_recipients or has_cc_recipients or has_bcc_recipients):
             raise forms.ValidationError(
-                "Please select at least one contact group or individual contact."
+                "Please select at least one recipient. You can choose main recipients (To), "
+                "CC recipients, or BCC recipients - or any combination of them."
             )
+        
+        # Validate CC emails
+        if cc:
+            cc_emails = [email.strip() for email in cc.split(',') if email.strip()]
+            for email in cc_emails:
+                try:
+                    forms.EmailField().clean(email)
+                except forms.ValidationError:
+                    raise forms.ValidationError(f"Invalid CC email address: {email}")
+        
+        # Validate BCC emails
+        if bcc:
+            bcc_emails = [email.strip() for email in bcc.split(',') if email.strip()]
+            for email in bcc_emails:
+                try:
+                    forms.EmailField().clean(email)
+                except forms.ValidationError:
+                    raise forms.ValidationError(f"Invalid BCC email address: {email}")
         
         return cleaned_data
 
@@ -251,7 +297,7 @@ class EmailTemplateForm(forms.ModelForm):
             }),
             'html_content': forms.Textarea(attrs={
                 'class': 'w-full px-4 py-3 bg-slate-900/50 border-2 border-slate-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-200',
-                'rows': 12,
+                'style': 'min-height: 480px; resize: vertical;',
                 'placeholder': 'HTML content'
             }),
             'text_content': forms.Textarea(attrs={

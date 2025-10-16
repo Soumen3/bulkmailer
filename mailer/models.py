@@ -64,14 +64,20 @@ class EmailCampaign(models.Model):
     from_email = models.EmailField()
     from_name = models.CharField(max_length=100, blank=True)
     reply_to = models.EmailField(blank=True)
+    cc = models.TextField(blank=True, help_text="Comma-separated email addresses for CC")
+    bcc = models.TextField(blank=True, help_text="Comma-separated email addresses for BCC")
     
     # Email content
-    html_content = models.TextField(help_text="HTML version of the email")
+    html_content = models.TextField(blank=True, help_text="HTML version of the email")
     text_content = models.TextField(blank=True, help_text="Plain text version (optional)")
     
     # Recipients
     contact_groups = models.ManyToManyField(ContactGroup, blank=True, related_name='campaigns')
     individual_contacts = models.ManyToManyField(Contact, blank=True, related_name='campaigns')
+    
+    # CC and BCC as groups
+    cc_groups = models.ManyToManyField(ContactGroup, blank=True, related_name='cc_campaigns')
+    bcc_groups = models.ManyToManyField(ContactGroup, blank=True, related_name='bcc_campaigns')
     
     # Status and timing
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
@@ -91,12 +97,21 @@ class EmailCampaign(models.Model):
 
     def get_total_recipients(self):
         """Calculate total number of recipients"""
-        group_contacts = Contact.objects.filter(
+        # Get all contact IDs from groups
+        group_contact_ids = Contact.objects.filter(
             group__in=self.contact_groups.all(),
             is_active=True
-        ).distinct()
-        individual_contacts = self.individual_contacts.filter(is_active=True)
-        return (group_contacts | individual_contacts).distinct().count()
+        ).values_list('id', flat=True)
+        
+        # Get all individual contact IDs
+        individual_contact_ids = self.individual_contacts.filter(
+            is_active=True
+        ).values_list('id', flat=True)
+        
+        # Combine and get unique contact IDs
+        all_contact_ids = set(group_contact_ids) | set(individual_contact_ids)
+        
+        return len(all_contact_ids)
 
     def get_sent_count(self):
         return self.email_logs.filter(status='sent').count()
